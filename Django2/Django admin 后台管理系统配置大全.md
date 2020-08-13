@@ -74,6 +74,21 @@ date_hierarchy = 'join_time'
 
 
 
+## 8 自定义日期显示格式
+
+```
+USE_L10N = False
+DATETIME_FORMAT = 'Y-m-d H:i:s'
+DATE_FORMAT = 'Y-m-d'
+
+说明：
+	1. 修改后的格式：2020-08-12 16:42:10
+```
+
+- 后端默认是2020年8月15日
+
+
+
 # 2 站点设置
 
 ## 1 设置站点的标题和页签上面的文字
