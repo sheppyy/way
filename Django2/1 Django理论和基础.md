@@ -1603,7 +1603,123 @@ class Personnel(models.Model):
 
 
 
-### 5.2.3 表关系：一对一
+### 5.2.3 外键
+
+
+
+在 MySQL 中，表有两种引擎，InnoDB和myisam 。InnoDB 引擎是支持外键约束的。外键的存在使得 ORM 框架在处理表关系的时候异常的强大。
+
+
+
+类定义
+
+```
+class ForeignKey(to,on_delete,**options) 
+
+说明：	
+	to：是要关联的模型
+	on_delete：在使用外键引用的模型数据被删除了，这个字段该如何处理，参考5.2.3 常用的字段及属性的说明。
+	这两个参数是必须的。
+	
+	author = models.ForeignKey("User",on_delete=models.CASCADE)
+	或
+	author = models.ForeignKey(User,on_delete=models.CASCADE)
+```
+
+
+
+在数据库底层都是存外键的，表面看起来是存对象🐏。
+
+
+
+
+
+### 5.2.4 表关系
+
+
+
+有时候真的分不清表之间的关系，怎么想怎么有道理。
+
+但是，表关系很重要，也很好用。
+
+
+
+表自己的关系可以自己维护，自己维护的好处就是便利，知道发生了什么
+
+也可以给django维护，django维护的好处就是便利
+
+
+
+#### 一对一
+
+
+
+场景
+
+```
+一个用户有一个用户详细信息
+```
+
+
+
+**实现：django维护关系**
+
+```python
+class User(models.Model):
+    username = models.CharField(max_length=20)
+    password = models.CharField(max_length=100)
+
+class UserInfo(models.Model):
+    birthday = models.DateTimeField(blank=True,null=True)
+    school = models.CharField(blank=True,max_length=50)
+    # 映射到数据库是，就成了user_id
+    user = models.OneToOneField("User", on_delete=models.CASCADE)
+```
+
+
+
+**实现：自己维护**
+
+```python
+class User(models.Model):
+    username = models.CharField(max_length=20)
+    password = models.CharField(max_length=100)
+
+    
+class UserInfo(models.Model):
+    birthday = models.DateTimeField(blank=True,null=True)
+    school = models.CharField(blank=True,max_length=50)
+    # 自己定义
+    user_id = models.IntegerField(blank=True,null=True)
+```
+
+
+
+#### 一对多
+
+
+
+场景
+
+```
+一个作者有多篇文章
+```
+
+
+
+**实现**
+
+```python
+class Author(models.Model):
+    username = models.CharField(max_length=20)
+    password = models.CharField(max_length=100)
+
+
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    author = models.ForeignKey("User",on_delete=models.CASCADE)
+```
 
 
 

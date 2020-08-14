@@ -1,6 +1,6 @@
 # 1 当前页面是设置
 
-## 1 list_display：显示
+## 1.1 list_display：显示
 
 ```
 list_display = ['username', 'gender', ...]
@@ -10,7 +10,7 @@ list_display = ['username', 'gender', ...]
 
 
 
-## 2 list_per_page：分页
+## 1.2 list_per_page：分页
 
 ```
 list_per_page = 30
@@ -20,7 +20,7 @@ list_per_page = 30
 
 
 
-## 3 ordering：排序
+## 1.3 ordering：排序
 
 ```
 ordering = ['name', 'add_time', ...]
@@ -32,7 +32,7 @@ ordering = ['name', 'add_time', ...]
 
 
 
-## 4 list_editable：可编辑
+## 1.4 list_editable：可编辑
 
 ```
 list_editable = ['name', 'age', ...]
@@ -43,7 +43,7 @@ list_editable = ['name', 'age', ...]
 
 
 
-## 5 list_filter：筛选
+## 1.5 list_filter：筛选
 
 ```
 list_filter = ['gender', ...]
@@ -54,7 +54,7 @@ list_filter = ['gender', ...]
 
 
 
-## 6 search_fields：搜索
+## 1.6 search_fields：搜索
 
 ```
 search_fields = ['name', 'address', ...]
@@ -64,7 +64,7 @@ search_fields = ['name', 'address', ...]
 
 
 
-## 7 date_hierarchy：日期等级划分
+## 1.7 date_hierarchy：日期等级划分
 
 ```
 date_hierarchy = 'join_time'
@@ -74,7 +74,7 @@ date_hierarchy = 'join_time'
 
 
 
-## 8 自定义日期显示格式
+## 1.8 自定义日期显示格式
 
 ```
 USE_L10N = False
@@ -85,13 +85,33 @@ DATE_FORMAT = 'Y-m-d'
 	1. 修改后的格式：2020-08-12 16:42:10
 ```
 
-- 后端默认是2020年8月15日
+- 默认是2020年8月15日
+
+
+
+
+
+## 1.9 加入详情页
+
+
+
+默认是点击第一个字段进入详情页的，可以自定义进入详情页的字段
+
+```
+list_display_links = ['id', 'name', ...]
+```
+
+
+
+
 
 
 
 # 2 站点设置
 
-## 1 设置站点的标题和页签上面的文字
+
+
+## 2.1 设置站点的标题和页签上面的文字
 
 ```
 admin.site.site_header = 'SSS'
@@ -110,6 +130,65 @@ admin.site.site_title = 'SSS'
 
 
 2 
+
+
+
+
+
+# 3 actions设置
+
+
+
+## 3.1 屏蔽默认的按钮
+
+
+
+```
+class UserAdmin(admin.ModelAdmin):
+    list_display = User.keys()
+    
+    # 在对应的Admin模型增加权限函数屏蔽即可；这里屏蔽了add按钮
+    def has_add_permission(self, request):
+        return False
+```
+
+
+
+
+
+
+
+```
+
+```
+
+
+
+
+
+```
+
+```
+
+
+
+```
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
