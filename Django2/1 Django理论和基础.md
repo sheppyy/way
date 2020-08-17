@@ -1542,38 +1542,38 @@ class Personnel(models.Model):
 
 
 
-| 自增字段                           | 说明                                              |      |
-| ---------------------------------- | ------------------------------------------------- | ---- |
-| models.BigAutoField()              |                                                   |      |
-| models.AutoField()                 | 这两个都是自增的，默认从1开始                     |      |
-| **二进制字段**                     |                                                   |      |
-| models.BinaryField()               | 可以把图片内容读，再存到数据库...应该挺少人这么干 |      |
-| **布尔型**                         |                                                   |      |
-| models.BooleanField()              |                                                   |      |
-| models.NullBooleanField()          |                                                   |      |
-| **整型**                           |                                                   |      |
-| models.PositiveSmallIntegerField() | 5个字节                                           |      |
-| models.SmallIntegerField()         | 6个字节                                           |      |
-| models.PositiveIntegerField()      | 10个字节                                          |      |
-| models.IntegerField()              | 11个字节                                          |      |
-| models.BigIntegerField()           | 20个字节                                          |      |
-| **字符串类型**                     |                                                   |      |
-| models.CharField()                 | varchar，可变长字符串                             |      |
-| model.TextField()                  | longtext，文本类型                                |      |
-| **时间日期类型**                   |                                                   |      |
-| models.DateField()                 | 日期类型                                          |      |
-| models.DateTimeField()             | 时间日期类型                                      |      |
-| models.DurationField()             | int, Python timedelta实现                         |      |
-| **浮点型**                         |                                                   |      |
-| models.FloatField()                |                                                   |      |
-| models.DecimalField()              |                                                   |      |
-| **其他字段**                       |                                                   |      |
-| models.EmailField()                | 邮箱字段                                          |      |
-| models.ImageField()                | 图片字段                                          |      |
-| models.FileField()                 | 文件字段                                          |      |
-| models.FilePathField()             | 文件路径字段                                      |      |
-| models.URLField()                  | url字段                                           |      |
-| models.UUIDField()                 | 唯一字段                                          |      |
+| 自增字段                           | 说明                                                         |      |
+| ---------------------------------- | ------------------------------------------------------------ | ---- |
+| models.BigAutoField()              |                                                              |      |
+| models.AutoField()                 | 这两个都是自增的，默认从1开始                                |      |
+| **二进制字段**                     |                                                              |      |
+| models.BinaryField()               | 可以把图片内容读，再存到数据库...应该挺少人这么干            |      |
+| **布尔型**                         |                                                              |      |
+| models.BooleanField()              |                                                              |      |
+| models.NullBooleanField()          |                                                              |      |
+| **整型**                           |                                                              |      |
+| models.PositiveSmallIntegerField() | 正小整型，5个字节，0~32767                                   |      |
+| models.SmallIntegerField()         | 小整型，6个字节，-32768~32767                                |      |
+| models.PositiveIntegerField()      | 正整型，10个字节，0~2147483647                               |      |
+| models.IntegerField()              | 整型，11个字节-2147483648~2147483647                         |      |
+| models.BigIntegerField()           | 大整型，20个字节，-9223372036854775808~9223372036854775807   |      |
+| **字符串类型**                     |                                                              |      |
+| models.CharField()                 | varchar，可变长字符串，超过254个字符则不建议使用，用下面那个 |      |
+| model.TextField()                  | longtext，文本类型                                           |      |
+| **时间日期类型**                   |                                                              |      |
+| models.DateField()                 | 日期类型                                                     |      |
+| models.DateTimeField()             | 时间日期类型                                                 |      |
+| models.DurationField()             | int, Python timedelta实现                                    |      |
+| **浮点型**                         |                                                              |      |
+| models.FloatField()                |                                                              |      |
+| models.DecimalField()              |                                                              |      |
+| **其他字段**                       |                                                              |      |
+| models.EmailField()                | 邮箱字段， 不指定max_length时，默认254                       |      |
+| models.ImageField()                | 图片字段                                                     |      |
+| models.FileField()                 | 文件字段                                                     |      |
+| models.FilePathField()             | 文件路径字段                                                 |      |
+| models.URLField()                  | url字段                                                      |      |
+| models.UUIDField()                 | 唯一字段                                                     |      |
 
 
 
@@ -1624,6 +1624,14 @@ class ForeignKey(to,on_delete,**options)
 	author = models.ForeignKey("User",on_delete=models.CASCADE)
 	或
 	author = models.ForeignKey(User,on_delete=models.CASCADE)
+	
+	
+
+当跨app关联模型时
+	1.  在模型前面加上app的名字
+		author = models.ForeignKey("user.User",on_delete=models.CASCADE)
+	
+	2. 先从其他app引入模型，再关联（额...我都这么干）
 ```
 
 
@@ -1654,7 +1662,7 @@ class ForeignKey(to,on_delete,**options)
 
 
 
-场景
+**场景**
 
 ```
 一个用户有一个用户详细信息
@@ -1699,7 +1707,7 @@ class UserInfo(models.Model):
 
 
 
-场景
+**场景**
 
 ```
 一个作者有多篇文章
@@ -1723,6 +1731,971 @@ class Article(models.Model):
 
 
 
+获取第一个作者的所有文章
+
+```python
+author = Author.objects.first()
+articles = author.article_set.all()
+```
+
+
+
+#### 多对多
+
+
+
+**应用场景**
+
+```
+文章和标签的关系
+一篇文章有多个标签，一个标签可以分配给多个文章
+```
+
+
+
+**实现**
+
+```python
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    
+    # ManyToManyFields：多对多的字段
+    tags = models.ManyToManyField("Tag",related_name="articles")
+    
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+    
+
+说明：
+	1. 使用ManyToManyField后，会自己曾经一个中间表来维护关系
+    2. 
+```
+
+
+
+### related_name和related_query_name
+
+
+
+获取作者所有的文字：
+
+ ```
+author.article_set.all()
+
+说明：
+	1. article_set：即模型对象的小写，加上_set来访问
+	2. 
+ ```
+
+
+
+而这名字可以修改
+
+```python
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    # 传递related_name参数，以后在方向引用的时候使用articles进行访问
+    author = models.ForeignKey("User",on_delete=models.SET_NULL,null=True,related_name='articles')
+```
+
+访问的时候则
+
+```
+author = Author.objects.first()
+author.articles.all()
+```
+
+
+
+### 5.2.5 模型的操作
+
+
+
+#### 增加
+
+```
+book = Book(name='三国演义',desc='三国英雄！')
+book.save()
+或直接
+Book(name='三国演义',desc='三国英雄！').save()
+```
+
+#### 数据查询
+
+
+
+1. 查询所有数据
+
+```
+books = Book.objects.all()
+```
+
+2. 过滤
+
+```
+books = Book.objects.filter(name='ydc', ...)
+```
+
+3. 获取单个对象
+
+```
+books = Book.objects.get(name='ydc')
+```
+
+4. 排序
+
+```
+books = Book.objects.order_by('date')
+
+说明：
+	1. 排序默认是升序的
+	2. 降序可以使用：books = Book.objects.order_by('-date')
+```
+
+
+
+#### 修改数据
+
+```
+books = Book.objects.get(name='ydc')
+books.name = 'maker'
+...
+books.save()
+或者
+Book.objects.get(name='ydc').update(name='maker')
+```
+
+
+
+#### 删除数据
+
+```
+books = Book.objects.get(name='ydc')
+books.delete()
+或者
+Book.objects.get(name='ydc').delete()
+
+可以一次删除多条记录
+Book.objects.filter(name='ydc').delete()
+Book.objects.all().delete()
+```
+
+
+
+
+
+#### 查询操作
+
+##### 条件查询
+
+**exact**
+
+```
+article = Article.objects.get(id__exact=14)
+article = Article.objects.get(id__exact=None)
+
+
+说明：
+	1. 精确查询，即“=”，name='ydc'，没有特殊字符匹配
+	2. None会解释为NULL
+	3. 相当于
+		select ... from article where id=14;
+		select ... from article where id IS NULL;
+```
+
+​	  **iexact**
+
+```python
+article = Article.objects.filter(title__iexact='hello world')
+
+说明：
+	1. 即like查询
+	2. 相当于：select ... from article where title like 'hello world';
+```
+
+​	 **contains**
+
+```python
+articles = Article.objects.filter(title__contains='hello')
+
+说明：
+	1. 大小写敏感，判断某个字段是否包含了某个数据。
+	2. 相当于：select ... where title like binary '%hello%';
+	3. 
+```
+
+**icontains**
+
+```python
+articles = Article.objects.filter(title__icontains='hello')
+
+说明：
+	1. 大小写 不 敏感的匹配查询。
+	2. 相当于：select ... where title like '%hello%';
+```
+
+**in**
+
+```python
+articles = Article.objects.filter(id__in=[1,2,3])
+
+说明：
+	1. 提取那些给定的 field 的值是否在给定的容器中。容器可以为 list 、 tuple 或者任何一个可以迭代的对象，包括 QuerySet 对象。
+	2. 相当于：select ... where id in (1,3,4)
+```
+
+```python
+inner_qs = Article.objects.filter(title__contains='hello')
+categories = Category.objects.filter(article__in=inner_qs)
+
+相当于：select ...from category where article.id in (select id from article where title like '%hello%');
+```
+
+**gt**
+
+```python
+articles = Article.objects.filter(id__gt=4)
+
+说明：
+	1. 某个 field 的值要大于给定的值。
+	2. 相当于：select ... where id > 4;
+```
+
+除了gt，还有：
+
+gte：大于等于
+
+lt：小于
+
+lte：小于等于
+
+
+
+**startswith**
+
+```python
+articles = Article.objects.filter(title__startswith='hello')
+
+说明：
+	1. 判断某个字段的值是否是以某个值开始的，大小写敏感。
+	2. 相当于：select ... where title like 'hello%'
+```
+
+**istartswith**
+
+类似于startswith，但大小写是不敏感的。
+
+**endswith**
+
+```python
+articles = Article.objects.filter(title__endswith='world')
+
+说明：
+	 1. 判断某个字段的值是否以某个值结束。大小写敏感。
+	 2. 相当于：select ... where title like '%world';
+```
+
+**iendswith**
+
+类似于endswith，但大小写是不敏感的。
+
+**range**
+
+```python
+from django.utils.timezone import make_aware
+from datetime import datetime
+start_date = make_aware(datetime(year=2018,month=1,day=1))
+end_date = make_aware(datetime(year=2018,month=3,day=29,hour=16))
+
+articles = Article.objects.filter(pub_date__range=(start_date,end_date))
+
+说明：
+	1. 判断某个 field 的值是否在给定的区间中。
+    2. 相当于：select ... from article where pub_time between '2020-01-01' and '2020-12-12'。
+```
+
+**date**
+
+```python
+articles = Article.objects.filter(pub_date__date=date(2020,8,29))
+
+
+说明：
+	1. 针对某些 date 或者 datetime 类型的字段。可以指定 date 的范围。并且这个时间过滤，还可以使用链式调用。
+	2. 相当于：select ... WHERE DATE(CONVERT_TZ(`front_article`.`pub_date`, 'UTC', 'Asia/Shanghai')) = 2020-08-29
+```
+
+**year**
+
+```python
+articles = Article.objects.filter(pub_date__year=2020)
+articles = Article.objects.filter(pub_date__year__gte=2020)
+
+说明：
+	1. 根据年份进行查找。
+	2. select ... where pub_date between '2020-01-01' and '2020-12-31';
+		select ... where pub_date >= '2020-01-01';
+	3. 
+```
+
+**month：**同 year ，根据月份进行查找。
+
+**day：**同 year ，根据日期进行查找。
+
+**week_day：**同 year ，根据星期几进行查找。1表示星期天，7表示星期六， 2-6 代表的是星期一到星期五。
+
+**time**
+
+```python
+articles = Article.objects.filter(pub_date__time=datetime.time(12,12,12));
+
+说明：
+	1. 根据时间进行查找。
+	2. 
+```
+
+**isnull**
+
+```python
+articles = Article.objects.filter(pub_date__isnull=False)
+
+说明：
+	1. 根据值是否为空进行查找。
+	2. 相当于：select ... where pub_date is not null;
+```
+
+**regex和iregex**
+
+```python
+articles = Article.objects.filter(title__regex=r'^hello')
+
+说明：
+	1. 大小写敏感和大小写不敏感的正则表达式。
+	2. 相当于：select ... where title regexp binary '^hello';
+	3. iregex 是大小写不敏感的。
+```
+
+
+
+##### 关联的表进行查询
+
+```python
+class Category(models.Model):
+    """文章分类表"""
+    name = models.CharField(max_length=100)
+    
+class Article(models.Model):
+    """文章表"""
+    title = models.CharField(max_length=100,null=True)
+    category = models.ForeignKey("Category",on_delete=models.CASCADE)
+```
+
+
+
+获取文章标题中包含"hello"的所有的分类
+
+```python
+categories = Category.object.filter(article__title__contains("hello"))
+```
+
+
+
+#### 聚会函数
+
+
+
+##### Avg
+
+```python
+from django.db.models import Avg
+result = Book.objects.aggregate(Avg('price'))
+
+说明：
+	1. 求平均值。
+```
+
+##### Count
+
+```python
+from django.db.models import Count
+result = Book.objects.aggregate(book_num=Count('id'))
+result = Author.objects.aggregate(count=Count('email', distinct=True))
+
+说明
+	1. 获取指定的对象的个数。
+	2. Count 类中，还有另外一个参数叫做 distinct ，默认是等于 False ，如果是等于 True ，那么将去掉那些重复的值。
+```
+
+##### Max和Min
+
+```python
+from django.db.models import Max, Min
+result = Author.objects.aggregate(Max('age'), Min('age'))
+
+说明
+	1. 最大的年龄是88,最小的年龄是18。
+	2. 
+```
+
+##### Sum
+
+```python
+from djang.db.models import Sum
+result = Book.objects.annotate(total=Sum("bookstore__price")).values("name","total")
+
+说明：
+	1. 求指定对象的总和。
+```
+
+
+
+### aggregate和annotate的区别
+
+1. aggregate ：返回使用聚合函数后的字段和值。
+2. annotate ：在原来模型字段的基础之上添加一个使用了聚合函数的字段，并且在使用聚合函
+数的时候，会使用当前这个模型的主键进行分组（group by）。
+
+
+
+### F表达式和Q表达式
+
+
+
+##### F
+
+```python
+employees = Employee.objects.all()
+for employee in employees:
+    employee.salary += 1000
+    employee.save()
+
+说明过程可以优化成下面：
+
+from djang.db.models import F
+Employee.object.update(salary=F("salary") + 1000)
+
+说明：
+	1. F表达式并不会马上从数据库中获取数据，而是在生成SQL语句的时候，动态的获取传给F表达式的值。
+```
+
+##### Q
+
+```python
+books = Book.objects.filter(price__gte=100,rating__gte=9)
+
+说明过程可以写成：
+
+from django.db.models import Q
+books = Book.objects.filter(Q(price__lte=10) | Q(rating__lte=9))
+
+说明：
+	1. |或运算
+	2. &与运算
+	3. ~非运算
+
+
+from django.db.models import Q
+# 获取id等于3的图书
+books = Book.objects.filter(Q(id=3))
+# 获取id等于3，或者名字中包含文字"记"的图书
+books = Book.objects.filter(Q(id=3)|Q(name__contains("记")))
+# 获取价格大于100，并且书名中包含"记"的图书
+books = Book.objects.filter(Q(price__gte=100)&Q(name__contains("记")))
+# 获取书名包含“记”，但是id不等于3的图书
+books = Book.objects.filter(Q(name__contains='记') & ~Q(id=3))
+```
+
+
+
+### 5.2.6 QuerySet API
+
+![5 query set](D:\Me\Way\Django2\imags\5 query set.png)
+
+
+
+1. exclude
+
+**排除**满足条件的数据，返回一个新的 QuerySet 。
+
+```
+Article.objects.exclude(title__contains='hello')
+```
+
+2. annotate
+
+给 QuerySet 中的每个对象都添加一个使用查询表达式（聚合函数、F表达式、Q表达式、Func表达式等）的新字段。
+
+```
+articles = Article.objects.annotate(author_name=F("author__name"))
+```
+
+3. order_by
+
+指定将查询的结果根据某个字段进行排序。如果要倒序排序，那么可以在这个字段的前面加一个负号。
+
+```python
+# 根据创建的时间正序排序
+articles = Article.objects.order_by("create_time")
+# 根据创建的时间倒序排序
+articles = Article.objects.order_by("-create_time")
+# 根据作者的名字进行排序
+articles = Article.objects.order_by("author__name")
+# 首先根据创建的时间进行排序，如果时间相同，则根据作者的名字进行排序
+articles = Article.objects.order_by("create_time",'author__name')
+
+
+说明：
+	1. 当使用多个order_by时，后面的会覆盖前面的
+    2. 多个 order_by ，会把前面排序的规则给打乱，而使用后面的排序方式。
+```
+
+4. values
+
+```python
+articles = Article.objects.values("title",'content')
+for article in articles:
+	print(article)
+
+说明：
+	1. 用来指定在提取数据出来，需要提取哪些字段。返回字典形式的数据
+	2. {'title':　'title', 'content': 'content'}
+```
+
+5. values_list
+
+```python
+和values类似，返回的是元组的形式，(('title', 'content'))
+```
+
+
+
+# 6 高级视图
+
+
+
+## 6.1 限制请求method
+
+
+
+常用的method
+
+1. GET：从服务器获取数据。
+2. POST：向服务器提交时间。
+3. DELETE：删除服务器数据。
+4. PUT：更新服务器数据。
+5. ...
+
+
+
+## 6.2 内置的限制请求装饰器
+
+
+
+### 6.2.1 require_http_methods
+
+
+
+这个装饰器需要传递一个允许访问的方法的列表。比如只能通过 GET 的方式访问。
+
+```python
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET"])
+def my_view(request):
+    pass
+```
+
+
+
+### 6.2.2 require_GET
+
+
+
+这个装饰器相当于是 require_http_methods(['GET']) 的简写形式，只允许使用 GET 的 method 来访问视图。
+
+```python
+from django.views.decorators.http import require_GET
+
+@require_GET
+def my_view(request):
+	pass
+```
+
+
+
+### 6.2.3 require_POST
+
+
+
+这个装饰器相当于是 require_http_methods(['POST']) 的简写形式，只允许使用 POST 的 method 来访问视图。
+
+```python
+from django.views.decorators.http import require_POST
+
+@require_POST
+def my_view(request):
+	pass
+```
+
+
+
+### 6.2.4 require_safe
+
+
+
+这个装饰器相当于是 require_http_methods(['GET','HEAD']) 的简写形式，只允许使用相对安全的方式来访问视图。因为 GET 和 HEAD 不会对服务器产生增删改的行为。因此是一种相对安全的请求方式。
+
+```python
+from django.views.decorators.http import require_safe
+
+@require_safe
+def my_view(request):
+	pass
+```
+
+
+
+## 6.3 页面重定向
+
+
+
+重定向分为永久性重定向和暂时性重定向。
+
+在页面上体现的操作就是浏览器会从一个页面自动跳转到另外一个页面。
+
+- 永久性重定向
+
+```
+http的状态码是301，多用于旧网址被废弃了要转到一个新的网址确保用户的访问.
+最经典的就是京东网站，你输入www.jingdong.com的时候，会被重定向到www.jd.com.
+因为jingdong.com这个网址已经被废弃了，被改成jd.com，所以这种情况下应该用永久重定向。
+```
+
+
+
+- 暂时性重定向
+
+```
+http的状态码是302，表示页面的暂时性跳转。
+比如访问一个需要权限的网址，如果当前用户没有登录，应该重定向到登录页面，这种情况下，应该用暂时性重定向。
+```
+
+
+
+### redirect
+
+
+
+重定向是使用 redirect(to, *args, permanent=False, **kwargs) 来实现的。 
+
+to 是一个 url ， permanent 代表的是这个重定向是否是一个永久的重定向，默认是 False 。
+
+```python
+from django.shortcuts import reverse,redirect
+
+def profile(request):
+    if request.GET.get("username"):
+        return HttpResponse("%s，欢迎来到个人中心页面！")
+    else:
+        return redirect(reverse("user:login"))
+
+说明：
+	1. redirect(reverse("user:login")) ==》反向解析：redirect(reverse("app_name:url_name"))
+```
+
+
+
+## 6.4 HttpRequest对象
+
+
+
+### 6.4.1 WSGIRequest对象常用属性
+
+
+
+WSGIRequest 对象上大部分的属性都是只读的。因为这些属性是从客户端上传上来的，没必要做任何的修改。
+
+
+
+1. **path** ：请求服务器的完整“路径”，但不包含域名和参数。
+
+```
+ http://www.baidu.com/xxx/yyy/ ，那么 path 就是 /xxx/yyy/ 。
+```
+
+2. **method** ：代表当前请求的 http 方法。比如是 GET 还是 POST 。
+3. **GET** ：django.http.request.QueryDict 对象。操作起来类似于字典。
+
+```
+这个属性中包含了所有以 ?xxx=xxx 的方式上传上来的参数。
+```
+
+4. **POST** ：django.http.request.QueryDict 对象。这个属性中包含了所有以 POST 方式上传的参数。
+
+5. **FILES** ：django.http.request.QueryDict 对象。这个属性中包含了所有上传的文件。
+6. **COOKIES** ：标准的Python字典，包含所有的 cookie ，键值对都是字符串类型。
+7. **session** ：类似于字典的对象。用来操作服务器的 session 。
+8. **META** ：存储的客户端发送上来的所有 header 信息。
+9. **CONTENT_LENGTH** ：请求的正文的长度（是一个字符串）。
+10. **CONTENT_TYPE** ：请求的正文的MIME类型。
+11. **HTTP_ACCEPT** ：响应可接收的Content-Type。
+12. **HTTP_ACCEPT_ENCODING** ：响应可接收的编码。
+13. **HTTP_ACCEPT_LANGUAGE** ： 响应可接收的语言。
+14. **HTTP_HOST** ：客户端发送的HOST值。
+15. **HTTP_REFERER** ：在访问这个页面上一个页面的url。
+16. **QUERY_STRING** ：单个字符串形式的查询字符串（未解析过的形式）。
+17. **REMOTE_ADDR** ：客户端的IP地址。
+
+```python
+如果服务器使用了 nginx 做反向代理或者负载均衡，那么这个值返回的是 127.0.0.1 
+这时候可以使用 HTTP_X_FORWARDED_FOR 来获取
+所以获取 ip 地址的代码片段如下：
+
+if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+	ip = request.META['HTTP_X_FORWARDED_FOR']
+else:
+	ip = request.META['REMOTE_ADDR']
+```
+
+18. REMOTE_HOST ：客户端的主机名。
+19. REQUEST_METHOD ：请求方法。一个字符串类似于 GET 或者 POST 。
+20. SERVER_NAME ：服务器域名。
+21. SERVER_PORT ：服务器端口号，是一个字符串类型。
+
+
+
+### 6.4.2 WSGIRequest对象常用属性
+
+
+
+1. **is_secure()** ：是否是采用 https 协议。
+2. **is_ajax()** ：是否采用 ajax 发送的请求。原理就是判断请求头中是否存在 X-Requested-With:XMLHttpRequest 。
+3. **get_host()** ：服务器的域名。如果在访问的时候还有端口号，那么会加上端口号。比如 www.baidu.com:9000 。
+4. **get_full_path()** ：返回完整的path。如果有查询字符串，还会加上查询字符串。比如 /music/bands/?print=True 。
+5. **get_raw_uri()** ：获取请求的完整 url 。
+
+
+
+### 6.4.3 QueryDict对象
+
+
+
+request.GET 和 request.POST 都是 QueryDict 对象，这个对象继承自 dict ，因此用法跟 dict 相差无几。
+
+其中用得比较多的是 get 方法和 getlist 方法。
+
+1. **get** 方法：用来获取指定 key 的值，如果没有这个 key ，那么会返回 None 。
+2. **getlist** 方法：如果浏览器上传上来的 key 对应的值有多个，那么就需要通过这个方法获取。
+
+
+
+
+
+## 6.5 HttpResponse对象
+
+
+
+### 6.5.1 常用属性
+
+1. **content**：返回的内容。
+2. **status_code**：返回的HTTP响应状态码。
+3. **content_type**：返回的数据的MIME类型，默认为 text/html 。
+
+```
+浏览器会根据这个属性，来显示数据。
+如果是 text/html ，那么就会解析这个字符串，如果 text/plain ，那么就会显示一个纯文本。
+
+常用的 Content-Type 如下：
+    text/html（默认的，html文件）
+    text/plain（纯文本）
+    text/css（css文件）
+    text/javascript（js文件）
+    multipart/form-data（文件提交）
+    application/json（json传输）
+    application/xml（xml文件）
+```
+
+4. 设置请求头： response['X-Access-Token'] = 'xxxx' 。
+
+
+
+### 6.5.2 常用方法
+
+
+
+1. **set_cookie**：用来设置 cookie 信息。
+2. **delete_cookie**：用来删除 cookie 信息。
+3. **write**： HttpResponse 是一个类似于文件的对象，可以用来写入数据到数据体（content）中。
+
+
+
+### 6.5.3 JsonResponse类
+
+
+
+用来对象 dump 成 json 字符串，然后返回将 json 字符串封装成 Response 对象返回给浏览器。
+
+并且他的 Content-Type 是 application/json 。
+
+```python
+from django.http import JsonResponse
+
+def index(request):
+	return JsonResponse({"username":"zhiliao","age":18})
+```
+
+
+
+默认情况下 JsonResponse 只能对字典进行 dump ，如果想要对非字典的数据进行 dump ，那么需要给 JsonResponse 传递一个 safe=False 参数。
+
+```python
+from django.http import JsonResponse
+
+def index(request):
+    persons = ['张三','李四','王五']
+    return HttpResponse(persons)
+```
+
+以上代码会报错，应该在使用 HttpResponse 的时候，传入一个 **safe=False** 参数，示例代码如下：
+
+```python
+return HttpResponse(persons,safe=False)
+```
+
+
+
+## 6.6 生成CSV文件
+
+
+
+有时候做的网站，需要将一些数据，生成有一个 CSV 文件给浏览器，并且是作为附件的形式下载下来。
+
+
+
+### 6.6.1 生成小的CSV文件
+
+生成小的 CSV 文件为例。用 Python 内置的 csv 模块来处理 csv 文件，并且使用 HttpResponse 来将 csv 文件返回回去。
+
+```python
+import csv
+from django.http import HttpResponse
+
+def csv_view(request):
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['username', 'age', 'height', 'weight'])
+    writer.writerow(['zhiliao', '18', '180', '110'])
+    
+    return response
+
+说明：
+	1. 在初始化 HttpResponse 的时候，指定了 Content-Type 为 text/csv ，这将告诉浏览器，这是一个 csv 格式的文件而不是一个 HTML 格式的文件，如果用默认值，默认值就是 html ，那么浏览器将把 csv 格式的文件按照 html 格式输出。
+    2. 在 response 中添加一个 Content-Disposition 头，用来告诉浏览器该如何处理这个文件，给这个头的值设置为attachment，浏览器将不会对这个文件进行显示，而是作为附件的形式下载，第二个 filename="somefilename.csv" 是用来指定这个 csv 文件的名字。
+    3. 使用 csv 模块的 writer 方法，将相应的数据写入到 response 中。
+```
+
+
+
+### 6.6.2 将csv文件定义成模板
+
+
+
+将 csv 格式的文件定义成模板，然后使用 Django 内置的模板系统，并给这个模板传入一个 Context 对象，这样模板系统就会根据传入的 Context 对象，生成具体的 csv 文件。
+
+
+
+模板文件
+
+```
+{% for row in data %}
+    "{{ row.0|addslashes }}", 
+    "{{ row.1|addslashes }}", 
+    "{{row.2|addslashes }}", 
+    "{{ row.3|addslashes }}", 
+    "{{ row.4|addslashes }}"
+{% endfor %}
+```
+
+视图函数
+
+```python
+from django.http import HttpResponse
+from django.template import loader, Context
+
+def some_view(request):
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    csv_data = (
+        ('First row', 'Foo', 'Bar', 'Baz'),
+        ('Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"),
+    )
+    t = loader.get_template('my_template_name.txt')
+    response.write(t.render({"data": csv_data}))
+    
+    return response
+```
+
+
+
+### 6.6.3 生成大的CSV文件
+
+
+
+以上例子是生成的一个小的 csv 文件，如果想生成大型的 csv 文件，以上方式将有可能会发生**超时**的情况（服务器要生成一个大型csv文件，需要的时间可能会超过浏览器默认的超时时间）。
+
+这时候可以借助另外一个类，叫做 StreamingHttpResponse 对象，这个对象是将响应的数据作为一个流返回给客户端，而不是作为一个整体返回。
+
+```python
+class Echo:
+    """
+    定义一个可以执行写操作的类，以后调用csv.writer的时候，就会执行这个方法
+    """
+    def write(self, value):
+        
+    	return value
+    
+def large_csv(request):
+    
+    rows = (["Row {}".format(idx), str(idx)] for idx in range(655360))
+    pseudo_buffer = Echo()
+    writer = csv.writer(pseudo_buffer)
+    response = StreamingHttpResponse((writer.writerow(row) for row in rows),content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    
+	return response
+```
+
+这里构建了一个非常大的数据集 rows ，并且将其变成一个迭代器。
+
+然后因为 StreamingHttpResponse 的第一个参数只能是一个生成器，因此使用圆括号 (writer.writerow(row) for row in rows) ，并且因为要写的文件是 csv 格式的文件，因此需要调用 writer.writerow 将 row 变成一个 csv 格式的字符串。
+
+而调用 writer.writerow 又需要一个中间的容器，因此定义了一个非常简单的类 Echo ，这个类只实现一个 write 方法，以后在执行 csv.writer(pseudo_buffer) 的时候，就会调用 Echo.writer 方法。
+
+注意： StreamingHttpResponse 会启动一个进程来和客户端保持长连接，所以会很消耗资源。所以如果不是特殊要求，尽量少用这种方法。
+
+
+
+### 6.6.4 StreamingHttpResponse
+
+
+
+这个类是专门用来处理流数据的。
+
+使得在处理一些大型文件的时候，不会因为服务器处理时间过长而到时连接超时。
+
+这个类不是继承自 HttpResponse ，并且跟 HttpResponse 对比有以下几点区别：
+
+1. 这个类没有属性 content ，相反是 streaming_content 。
+
+2. 这个类的 streaming_content 必须是一个可以迭代的对象。
+3. 这个类没有 write 方法，如果给这个类的对象写入数据将会报错。
+
+注意： StreamingHttpResponse 会启动一个进程来和客户端保持长连接，所以会很消耗资源。所以如果不是特殊要求，尽量少用这种方法。
 
 
 
@@ -1730,30 +2703,749 @@ class Article(models.Model):
 
 
 
+## 6.7 类视图
+
+
+
+### 6.7.1 View
+
+
+
+django.views.generic.base.View是主要的类视图，所有的类视图都是继承自他。
+
+如果我们写自己的类视图，也可以继承自他。
+
+然后再根据当前请求的 method ，来实现不同的方法。
+
+比如，实现get方法，views.py：
+
+```python
+from django.views import View
+
+class BookDetailView(View):
+    def get(self,request,*args,**kwargs):
+        return render(request,'detail.html')
+```
+
+ urls.py 
+
+```python
+urlpatterns = [
+	path("detail/<book_id>/",views.BookDetailView.as_view(),name='detail')
+]
+```
+
+除了 get 方法， View 还支持以下方法：
+
+ ['get','post','put','patch','delete','head','options','trace'] 。
+
+
+
+如果用户访问了 View 中没有定义的方法。
+
+比如你的类视图只支持 get 方法，而出现了 post 方法，那么就会把这个请求转发给 http_method_not_allowed(request,*args,**kwargs) 。
+
+示例代码如下：
+
+```python
+class AddBookView(View):
+    def post(self,request,*args,**kwargs):
+    	return HttpResponse("书籍添加成功！")
+    
+    def http_method_not_allowed(self, request, *args, **kwargs):
+        return HttpResponse("您当前采用的method是：%s，本视图只支持使用post请求！" % request.method)
+```
+
+urls.py
+
+```python
+path("addbook/",views.AddBookView.as_view(),name='add_book')
+```
+
+
+
+如果你在浏览器中访问 addbook/ ，因为浏览器访问采用的是 get 方法，而 addbook 只支持 post 方法，因此以上视图会返回您当前采用的 method 是： GET ，本视图只支持使用 post 请求！。
+
+其实不管是 get 请求还是 post 请求，都会走 **dispatch(request,*args,**kwargs)** 方法，所以如果实现这个方法，**将能够对所有请求都处理到**。
+
+
+
+### 6.7.2 TemplateView
+
+
+
+django.views.generic.base.TemplateView，这个类视图是专门用来返回模版的。
+
+在这个类中，有两个属性是经常需要用到的，一个是 template_name ，这个属性是用来存储模版的路径，TemplateView 会自动的渲染这个变量指向的模版。
+
+另外一个是 get_context_data ，这个方法是用来返回上下文数据的，也就是在给模版传的参数的。
+
+示例代码如下：
+
+```python
+from django.views.generic.base import TemplateView
+
+class HomePageView(TemplateView):
+    
+    template_name = "home.html"
+    
+    def get_context_data(self, **kwargs):
+        
+        context = super().get_context_data(**kwargs)
+        context['username'] = "ydc"
+        
+        return context
+```
+
+urls.py
+
+```python
+from django.urls import path
+from myapp.views import HomePageView
+
+urlpatterns = [
+	path('', HomePageView.as_view(), name='home'),
+]
+```
+
+
+
+如果在模版中不需要传递任何参数，那么可以直接只在 urls.py 中使用 TemplateView 来渲染模版。
+
+示例代码如下：
+
+```python
+from django.urls import path
+from django.views.generic import TemplateView
+
+urlpatterns = [
+	path('about/', TemplateView.as_view(template_name="about.html")),
+]
+```
+
+
+
+### 6.7.3 ListView
+
+
+
+在网站开发中，经常会出现需要列出某个表中的一些数据作为列表展示出来。
+
+比如文章列表，图书列表等等。
+
+在 Django 中可以使用 ListView 来帮我们快速实现这种需求。
+
+示例代码如下：
+
+```python
+class ArticleListView(ListView):
+    
+    model = Article
+    template_name = 'article_list.html'
+    paginate_by = 10
+    context_object_name = 'articles'
+    ordering = 'create_time'
+    page_kwarg = 'page'
+    
+    def get_context_data(self, **kwargs):
+        
+        context = super(ArticleListView, self).get_context_data(**kwargs)
+        
+        return context
+    
+    def get_queryset(self):
+        
+    	return Article.objects.filter(id__lte=89)
+```
+
+1. 首先 ArticleListView 是继承自 ListView 。
+2. model ：重写 model 类属性，指定这个列表是给哪个模型的。
+3. template_name ：指定这个列表的模板。
+4. paginate_by ：指定这个列表一页中展示多少条数据。
+5. context_object_name ：指定这个列表模型在模板中的参数名称。
+6. ordering ：指定这个列表的排序方式。
+7. page_kwarg ：获取第几页的数据的参数名称。默认是 page 。
+8. get_context_data ：获取上下文的数据。
+9. get_queryset ：如果你提取数据的时候，并不是要把所有数据都返回，那么你可以重写这个方法。将一些不需要展示的数据给过滤掉。
+
+
+
+### 6.7.4 Paginator和Page类
+
+
+
+Paginator 和 Page 类都是用来做分页的。
+
+他们在 Django 中的路径为 django.core.paginator.Paginator 和 django.core.paginator.Page 。
+
+以下对这两个类的常用属性和方法做解释：
+
+
+
+### 6.7.5 Paginator常用属性和方法
+
+
+
+1. count ：总共有多少条数据。
+2. num_pages ：总共有多少页。
+3. page_range ：页面的区间。比如有三页，那么就 range(1,4) 。
+
+
+
+### 6.7.6 Page常用属性和方法
+
+
+
+1. has_next ：是否还有下一页。
+2. has_previous ：是否还有上一页。
+3. next_page_number ：下一页的页码。
+4. previous_page_number ：上一页的页码。
+5. number ：当前页。
+6. start_index ：当前这一页的第一条数据的索引值。
+7. end_index ：当前这一页的最后一条数据的索引值。
+
+
+
+### 6.7.7 给类视图添加装饰器
+
+
+
+在开发中，有时候需要给一些视图添加装饰器。
+
+如果用函数视图那么非常简单，只要在函数的上面写上装饰器就可以了。但是如果想要给类添加装饰器，那么可以通过以下两种方式来实现：
+
+
+
+1. 装饰dispatch方法
+
+```python
+from django.utils.decorators import method_decorator
+
+
+def login_required(func):
+    def wrapper(request,*args,**kwargs):
+        if request.GET.get("username"):
+        	return func(request,*args,**kwargs)
+        else:
+            return redirect(reverse('index'))
+    return wrapper
+    
+class IndexView(View):
+    def get(self,request,*args,**kwargs):
+    	return HttpResponse("index")
+    	
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+    	super(IndexView, self).dispatch(request,*args,**kwargs)
+```
+
+
+
+### 6.7.8 直接装饰在整个类上
+
+
+
+```python
+from django.utils.decorators import method_decorator
+
+def login_required(func):
+    def wrapper(request,*args,**kwargs):
+    	if request.GET.get("username"):
+    		return func(request,*args,**kwargs)
+    	else:
+    		return redirect(reverse('login'))
+    return wrapper
+
+
+@method_decorator(login_required,name='dispatch')
+class IndexView(View):
+    def get(self,request,*args,**kwargs):
+    	return HttpResponse("index")
+    def dispatch(self, request, *args, **kwargs):
+    	super(IndexView, self).dispatch(request,*args,**kwargs)
+```
 
 
 
 
 
+## 6.8 错误处理
 
 
 
+在一些网站开发中，经常会需要捕获一些错误，然后将这些错误返回比较优美的界面，或者是将这个错误的请求做一些日志保存。那么我们本节就来讲讲如何实现。
 
 
 
+### 6.8.1 常用的错误码
 
 
 
+```
+404 ：服务器没有指定的url。
+403 ：没有权限访问相关的数据。
+405 ：请求的 method 错误。
+400 ： bad request ，请求的参数错误。
+500 ：服务器内部错误，一般是代码出bug了。
+502 ：一般部署的时候见得比较多，一般是 nginx 启动了，然后 uwsgi 有问题。
+```
 
 
 
+### 6.8.2 自定义错误模板
 
 
 
+在碰到比如 404 ， 500 错误的时候，想要返回自己定义的模板。
+
+那么可以直接在 templates 文件夹下创建相应错误代码的 html 模板文件。那么以后在发生相应错误后，会将指定的模板返回。
 
 
 
+### 6.8.3 错误处理的解决方案
 
+
+
+对于 404 和 500 这种自动抛出的错误。
+
+我们可以直接在 templates 文件夹下新建相应错误代码的模板文件。而对于其他的错误，我们可以专门定义一个 app ，用来处理这些错误。
+
+```python
+from django.shortcuts import render
+
+def view_403(request):
+	return render(request, 'errors/403.html', status=403)
+
+def view_400(request):
+	return render(request, 'errors/400.html', status=400)
+```
+
+
+
+# 7 表单
+
+
+
+## 7.1 表单概述
+
+
+
+### 7.1.1 HTML中的表单
+
+
+
+单纯从前端的 html 来说，表单是用来提交数据给服务器的,不管后台的服务器用的是 Django 还是 PHP 语言还是其他语言。
+
+只要把 input 标签放在 form 标签中，然后再添加一个提交按钮，那么以后点击提交按钮，就可以将 input 标签中对应的值提交给服务器了。
+
+
+
+### 7.1.2 HTML中的表单
+
+
+
+Django 中的表单丰富了传统的 HTML 语言中的表单。在 Django 中的表单，主要做以下两件事：
+1. 渲染表单模板。
+2. 表单验证数据是否合法。
+
+
+
+### 7.1.3 Django中表单使用流程
+
+
+
+在讲解 Django 表单的具体每部分的细节之前。我们首先先来看下整体的使用流程。
+
+这里以一个做一个留言板为例。首先我们在后台服务器定义一个表单类，继承自 django.forms.Form 。示例代码如下：
+
+```python
+# forms.py
+class MessageBoardForm(forms.Form):
+    title = forms.CharField(max_length=3,label='标题',min_length=2,error_messages={"min_length":'标题字符段不符合要求！'})
+    content = forms.CharField(widget=forms.Textarea,label='内容')
+    email = forms.EmailField(label='邮箱')
+    reply = forms.BooleanField(required=False,label='回复')
+```
+
+然后在视图中，根据是 GET 还是 POST 请求来做相应的操作。
+
+如果是 GET 请求，那么返回一个空的表单，如果是 POST 请求，那么将提交上来的数据进行校验。
+
+示例代码如下：
+
+```python
+# views.py
+class IndexView(View):
+
+    def get(self,request):
+        form = MessageBoardForm()
+        return render(request,'index.html',{'form':form})
+
+
+    def post(self,request):
+        form = MessageBoardForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            content = form.cleaned_data.get('content')
+            email = form.cleaned_data.get('email')
+            reply = form.cleaned_data.get('reply')
+            return HttpResponse('success')
+        else:
+            print(form.errors)
+            return HttpResponse('fail')
+```
+
+在使用 GET 请求的时候，我们传了一个 form 给模板，那么以后模板就可以使用 form 来生成一个表单的 html 代码。
+
+在使用 POST 请求的时候，我们根据前端上传上来的数据，构建一个新的表单，这个表单是用来验证数据是否合法的，如果数据都验证通过了，那么我们可以通过 cleaned_data 来获取相应的数据。
+
+在模板中渲染表单的 HTML 代码如下：
+
+```html
+<form action="" method="post">
+    <table>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="提交"></td>
+        </tr>
+    </table>
+</form>
+```
+
+我们在最外面给了一个 form 标签，然后在里面使用了 table 标签来进行美化，在使用 form 对象渲染的时候，使用的是 table 的方式，当然还可以使用 ul 的方式（ as_ul ），也可以使用 p 标签的方式（ as_p ），并且在后面我们还加上了一个提交按钮。这样就可以生成一个表单了。
+
+
+
+## 7.2 用表单验证数据
+
+
+
+### 7.2.1 常用的Field
+
+
+
+使用 Field 可以是对数据验证的第一步。你期望这个提交上来的数据是什么类型，那么就使用什么类型的 Field 。
+
+
+
+**CharField**
+
+```
+用来接收文本。
+
+参数：
+    max_length：这个字段值的最大长度。
+    min_length：这个字段值的最小长度。
+    required：这个字段是否是必须的。默认是必须的。
+    error_messages：在某个条件验证失败的时候，给出错误信息。
+```
+
+
+
+**EmailField**
+
+```
+用来接收邮件，会自动验证邮件是否合法。
+
+错误信息的key： required 、 invalid 。
+```
+
+
+
+**FloatField**
+
+```
+用来接收浮点类型，并且如果验证通过后，会将这个字段的值转换为浮点类型。
+
+参数：
+    max_value：最大的值。
+    min_value：最小的值。
+    
+错误信息的key： required 、 invalid 、 max_value 、 min_value 。
+```
+
+
+
+**IntegerField**
+
+```
+用来接收整形，并且验证通过后，会将这个字段的值转换为整形。
+
+参数：
+    max_value：最大的值。
+    min_value：最小的值。
+    
+错误信息的key： required 、 invalid 、 max_value 、 min_value 。
+```
+
+
+
+**URLField**
+
+```
+用来接收 url 格式的字符串。
+
+错误信息的key： required 、 invalid 。
+```
+
+
+
+### 7.2.2 常用验证器
+
+
+
+在验证某个字段的时候，可以传递一个 validators 参数用来指定验证器，进一步对数据进行过滤。
+
+验证器有很多，但是很多验证器我们其实已经通过这个 Field 或者一些参数就可以指定了。
+
+比如 EmailValidator ，我们可以通过 EmailField 来指定，比如 MaxValueValidator ，我们可以通过 max_value 参数来指定。
+
+以下是一些常用的验证器：
+
+1. MaxValueValidator ：验证最大值。
+2. MinValueValidator ：验证最小值。
+3. MinLengthValidator ：验证最小长度。
+4. MaxLengthValidator ：验证最大长度。
+5. EmailValidator ：验证是否是邮箱格式。
+6. URLValidator ：验证是否是 URL 格式。
+7. RegexValidator ：如果还需要更加复杂的验证，那么我们可以通过正则表达式的验证器： RegexValidator 。
+8. 比如现在要验证手机号码是否合格，那么我们可以通过以下代码实现：
+
+```python
+class MyForm(forms.Form):
+    telephone = forms.CharField(validators=[validators.RegexValidator("1[345678]\d{9}",message='请输入正确格式的手机号码！')])
+```
+
+
+
+### 7.2.3 自定义验证
+
+
+
+有时候对一个字段验证，不是一个长度，一个正则表达式能够写清楚的，还需要一些其他复杂的逻辑，那么我们可以对某个字段，进行自定义的验证。
+
+比如在注册的表单验证中，我们想要验证手机号码是否已经被注册过了，那么这时候就需要在数据库中进行判断才知道。
+
+对某个字段进行自定义的验证方式是，定义一个方法，这个方法的名字定义规则是： clean_fieldname 。如果验证失败，那么就抛出一个验证错误。
+
+比如要验证用户表中手机号码之前是否在数据库中存在，那么可以通过以下代码实现：
+
+```python
+class MyForm(forms.Form):
+    telephone = forms.CharField(validators[validators.RegexValidator("1[345678]\d{9}",
+    message='请输入正确格式的手机号码！')])
+    
+    def clean_telephone(self):
+        telephone = self.cleaned_data.get('telephone')
+        exists = User.objects.filter(telephone=telephone).exists()
+        if exists:
+        	raise forms.ValidationError("手机号码已经存在！")
+        return telephone
+```
+
+
+
+以上是对某个字段进行验证，如果验证数据的时候，需要针对多个字段进行验证，那么可以重写 clean 方法。比如要在注册的时候，要判断提交的两个密码是否相等。
+
+那么可以使用以下代码来完成：
+
+```python
+class MyForm(forms.Form):
+    telephone = forms.CharField(validators[validators.RegexValidator("1[345678]\d{9}",
+    message='请输入正确格式的手机号码！')])
+    pwd1 = forms.CharField(max_length=12)
+    pwd2 = forms.CharField(max_length=12)
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        pwd1 = cleaned_data.get('pwd1')
+        pwd2 = cleaned_data.get('pwd2')
+        if pwd1 != pwd2:
+        	raise forms.ValidationError('两个密码不一致！')
+```
+
+
+
+### 7.2.4 提取错误信息
+
+
+
+如果验证失败了，那么有一些错误信息是我们需要传给前端的。
+
+这时候我们可以通过以下属性来获取：
+
+1. form.errors ：这个属性获取的错误信息是一个包含了 html 标签的错误信息。
+2. form.errors.get_json_data() ：这个方法获取到的是一个字典类型的错误信息。将某个字段的名字作为 key ，错误信息作为值的一个字典。
+3. form.as_json() ：这个方法是将 form.get_json_data() 返回的字典 dump 成 json 格式的字符串，方便进行传输。
+4. 上述方法获取的字段的错误值，都是一个比较复杂的数据。比如以下：
+
+```python
+{'username': [
+        {'message': 'Enter a valid URL.', 'code': 'invalid'}, 
+        {'message': 'Ensurethis value has at most 4 characters (it has 22).', 'code': 'max_length'}
+    ]
+}
+```
+
+
+
+那么如果我只想把错误信息放在一个列表中，而不要再放在一个字典中。
+
+这时候我们可以定义一个方法，把这个数据重新整理一份。
+
+实例代码如下：
+
+```python
+class MyForm(forms.Form):
+    
+    username = forms.URLField(max_length=4)
+    
+    def get_errors(self):
+        errors = self.errors.get_json_data()
+         new_errors = {}
+        for key,message_dicts in errors.items():
+            messages = []
+            for message in message_dicts:
+            	messages.append(message['message'])
+            new_errors[key] = messages
+        return new_errors
+```
+
+这样就可以把某个字段所有的错误信息直接放在这个列表中。
+
+
+
+## 7.3 ModelForm
+
+
+
+大家在写表单的时候，会发现表单中的 Field 和模型中的 Field 基本上是一模一样的，而且表单中需要验证的数据，也就是我们模型中需要保存的。
+
+那么这时候我们就可以将模型中的字段和表单中的字段进行绑定。
+
+比如现在有个 Article 的模型。示例代码如下：
+
+```python
+from django.db import models
+from django.core import validators
+
+class Article(models.Model):
+    title = models.CharField(max_length=10,validators[validators.MinLengthValidator(li
+    mit_value=3)])
+    content = models.TextField()
+    author = models.CharField(max_length=100)
+    category = models.CharField(max_length=100)
+    create_time = models.DateTimeField(auto_now_add=True)
+```
+
+
+
+那么在写表单的时候，就不需要把 Article 模型中所有的字段都一个个重复写一遍了。
+
+示例代码如下：
+
+```python
+from django import forms
+    class MyForm(forms.ModelForm):
+        class Meta:
+        model = Article
+        fields = "__all__"
+```
+
+
+
+MyForm 是继承自 forms.ModelForm ，然后在表单中定义了一个 Meta 类，在 Meta 类中指定了 model=Article ，以及 fields="all" ，这样就可以将 Article 模型中所有的字段都复制过来，进行验证。
+
+如果只想针对其中几个字段进行验证，那么可以给 fields 指定一个列表，将需要的字段写进去。
+
+比如只想验证 title 和 content ，那么可以使用以下代码实现：
+
+```python
+from django import forms
+class MyForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = ['title','content']
+```
+
+
+
+如果要验证的字段比较多，只是除了少数几个字段不需要验证，那么可以使用 exclude 来代替 fields 。比如我不想验证 category ，那么示例代码如下：
+
+```python
+class MyForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        exclude = ['category']
+```
+
+
+
+### 7.3.1 自定义错误消息
+
+
+
+使用 ModelForm ，因为字段都不是在表单中定义的，而是在模型中定义的，因此一些错误消息无法在字段中定义。
+
+那么这时候可以在 Meta 类中，定义 error_messages ，然后把相应的错误消息写到里面去。
+
+示例代码如下：
+
+```python
+class MyForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        exclude = ['category']
+        error_messages ={
+            'title':{
+                'max_length': '最多不能超过10个字符！',
+                'min_length': '最少不能少于3个字符！'
+            },
+            'content': {
+            	'required': '必须输入content！',
+            }
+        }
+```
+
+**save方法**
+
+
+
+ModelForm 还有 save 方法，可以在验证完成后直接调用 save 方法，就可以将这个数据保存到数据库中了。
+
+示例代码如下：
+
+```python
+form = MyForm(request.POST)
+if form.is_valid():
+    form.save()
+        return HttpResponse('succes')
+else:
+	print(form.get_errors())
+	return HttpResponse('fail')
+```
+
+
+
+这个方法必须要在 clean 没有问题后才能使用，如果在 clean 之前使用，会抛出异常。
+
+另外，我们在调用 save 方法的时候，如果传入一个 commit=False ，那么只会生成这个模型的对象，而不会把这个对象真正的插入到数据库中。
+
+比如表单上验证的字段没有包含模型中所有的字段，这时候就可以先创建对象，再根据填充其他字段，把所有字段的值都补充完成后，再保存到数据库中。
+
+示例代码如下：
+
+```python
+form = MyForm(request.POST)
+if form.is_valid():
+    article = form.save(commit=False)
+    article.category = 'Python'
+    article.save()
+    return HttpResponse('succes')
+else:
+	print(form.get_errors())
+	return HttpResponse('fail')
+```
 
 
 
