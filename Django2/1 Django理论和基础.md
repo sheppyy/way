@@ -2833,7 +2833,7 @@ urlpatterns = [
 
 比如文章列表，图书列表等等。
 
-在 Django 中可以使用 ListView 来帮我们快速实现这种需求。
+在 Django 中可以使用 ListView 快速实现这种需求。
 
 示例代码如下：
 
@@ -2858,7 +2858,7 @@ class ArticleListView(ListView):
     	return Article.objects.filter(id__lte=89)
 ```
 
-1. 首先 ArticleListView 是继承自 ListView 。
+1. ArticleListView 是继承自 ListView 。
 2. model ：重写 model 类属性，指定这个列表是给哪个模型的。
 3. template_name ：指定这个列表的模板。
 4. paginate_by ：指定这个列表一页中展示多少条数据。
@@ -2912,7 +2912,9 @@ Paginator 和 Page 类都是用来做分页的。
 
 在开发中，有时候需要给一些视图添加装饰器。
 
-如果用函数视图那么非常简单，只要在函数的上面写上装饰器就可以了。但是如果想要给类添加装饰器，那么可以通过以下两种方式来实现：
+如果用函数视图那么非常简单，只要在函数的上面写上装饰器就可以了。
+
+但是如果想要给 **类** 添加装饰器，那么可以通过以下两种方式来实现：
 
 
 
@@ -2961,6 +2963,7 @@ def login_required(func):
 class IndexView(View):
     def get(self,request,*args,**kwargs):
     	return HttpResponse("index")
+    
     def dispatch(self, request, *args, **kwargs):
     	super(IndexView, self).dispatch(request,*args,**kwargs)
 ```
@@ -2973,7 +2976,7 @@ class IndexView(View):
 
 
 
-在一些网站开发中，经常会需要捕获一些错误，然后将这些错误返回比较优美的界面，或者是将这个错误的请求做一些日志保存。那么我们本节就来讲讲如何实现。
+在一些网站开发中，经常会需要捕获一些错误，然后将这些错误返回，或者是将这个错误的请求做一些日志保存。
 
 
 
@@ -2985,7 +2988,7 @@ class IndexView(View):
 404 ：服务器没有指定的url。
 403 ：没有权限访问相关的数据。
 405 ：请求的 method 错误。
-400 ： bad request ，请求的参数错误。
+400 ：bad request ，请求的参数错误。
 500 ：服务器内部错误，一般是代码出bug了。
 502 ：一般部署的时候见得比较多，一般是 nginx 启动了，然后 uwsgi 有问题。
 ```
@@ -2996,9 +2999,11 @@ class IndexView(View):
 
 
 
-在碰到比如 404 ， 500 错误的时候，想要返回自己定义的模板。
+在碰到404 ， 500 错误的时候，想要返回自己定义的模板。
 
-那么可以直接在 templates 文件夹下创建相应错误代码的 html 模板文件。那么以后在发生相应错误后，会将指定的模板返回。
+那么可以直接在 templates 文件夹下创建相应错误代码的 html 模板文件。
+
+那么以后在发生相应错误后，会将指定的模板返回。
 
 
 
@@ -3008,7 +3013,9 @@ class IndexView(View):
 
 对于 404 和 500 这种自动抛出的错误。
 
-我们可以直接在 templates 文件夹下新建相应错误代码的模板文件。而对于其他的错误，我们可以专门定义一个 app ，用来处理这些错误。
+可以直接在 templates 文件夹下新建相应错误代码的模板文件。
+
+而对于其他的错误，可以专门定义一个 app ，用来处理这些错误。
 
 ```python
 from django.shortcuts import render
@@ -3040,7 +3047,7 @@ def view_400(request):
 
 
 
-### 7.1.2 HTML中的表单
+### 7.1.2 Django中的表单
 
 
 
@@ -3054,18 +3061,25 @@ Django 中的表单丰富了传统的 HTML 语言中的表单。在 Django 中�
 
 
 
-在讲解 Django 表单的具体每部分的细节之前。我们首先先来看下整体的使用流程。
+django中的表单和数据模型很相似。
 
-这里以一个做一个留言板为例。首先我们在后台服务器定义一个表单类，继承自 django.forms.Form 。示例代码如下：
+这里以留言板为例。
+
+首先我们在后台服务器定义一个表单类，继承自 django.forms.Form 。
+
+示例代码如下：
 
 ```python
 # forms.py
 class MessageBoardForm(forms.Form):
+    
     title = forms.CharField(max_length=3,label='标题',min_length=2,error_messages={"min_length":'标题字符段不符合要求！'})
     content = forms.CharField(widget=forms.Textarea,label='内容')
     email = forms.EmailField(label='邮箱')
     reply = forms.BooleanField(required=False,label='回复')
 ```
+
+
 
 然后在视图中，根据是 GET 还是 POST 请求来做相应的操作。
 
@@ -3078,11 +3092,13 @@ class MessageBoardForm(forms.Form):
 class IndexView(View):
 
     def get(self,request):
+        
         form = MessageBoardForm()
         return render(request,'index.html',{'form':form})
 
 
     def post(self,request):
+        
         form = MessageBoardForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
@@ -3095,9 +3111,11 @@ class IndexView(View):
             return HttpResponse('fail')
 ```
 
-在使用 GET 请求的时候，我们传了一个 form 给模板，那么以后模板就可以使用 form 来生成一个表单的 html 代码。
 
-在使用 POST 请求的时候，我们根据前端上传上来的数据，构建一个新的表单，这个表单是用来验证数据是否合法的，如果数据都验证通过了，那么我们可以通过 cleaned_data 来获取相应的数据。
+
+在使用 GET 请求的时候，传了一个 form 给模板，那么以后模板就可以使用 form 来生成一个表单的 html 代码。
+
+在使用 POST 请求的时候，根据前端上传上来的数据，构建一个新的表单，这个表单是用来验证数据是否合法的，如果数据都验证通过了，那么可以通过 cleaned_data 来获取相应的数据。
 
 在模板中渲染表单的 HTML 代码如下：
 
@@ -3112,7 +3130,7 @@ class IndexView(View):
 </form>
 ```
 
-我们在最外面给了一个 form 标签，然后在里面使用了 table 标签来进行美化，在使用 form 对象渲染的时候，使用的是 table 的方式，当然还可以使用 ul 的方式（ as_ul ），也可以使用 p 标签的方式（ as_p ），并且在后面我们还加上了一个提交按钮。这样就可以生成一个表单了。
+在最外面给了一个 form 标签，然后在里面使用了 table 标签来进行美化，在使用 form 对象渲染的时候，使用的是 table 的方式，当然还可以使用 ul 的方式（ as_ul ），也可以使用 p 标签的方式（ as_p ），并且加上了一个提交按钮。
 
 
 
@@ -3124,7 +3142,7 @@ class IndexView(View):
 
 
 
-使用 Field 可以是对数据验证的第一步。你期望这个提交上来的数据是什么类型，那么就使用什么类型的 Field 。
+使用 Field 可以是对**数据验证的第一步**。你期望这个提交上来的数据是什么类型，那么就使用什么类型的 Field 。
 
 
 
@@ -3194,11 +3212,11 @@ class IndexView(View):
 
 
 
-在验证某个字段的时候，可以传递一个 validators 参数用来指定验证器，进一步对数据进行过滤。
+在验证某个字段的时候，可以传递一个 validators 参数用来指定验证器，**进一步对数据进行过滤**。
 
-验证器有很多，但是很多验证器我们其实已经通过这个 Field 或者一些参数就可以指定了。
+验证器有很多，但是很多验证器其实已经通过这个 Field 或者一些参数就可以指定了。
 
-比如 EmailValidator ，我们可以通过 EmailField 来指定，比如 MaxValueValidator ，我们可以通过 max_value 参数来指定。
+比如 EmailValidator ，可以通过 EmailField 来指定，比如 MaxValueValidator ，可以通过 max_value 参数来指定。
 
 以下是一些常用的验证器：
 
@@ -3208,8 +3226,8 @@ class IndexView(View):
 4. MaxLengthValidator ：验证最大长度。
 5. EmailValidator ：验证是否是邮箱格式。
 6. URLValidator ：验证是否是 URL 格式。
-7. RegexValidator ：如果还需要更加复杂的验证，那么我们可以通过正则表达式的验证器： RegexValidator 。
-8. 比如现在要验证手机号码是否合格，那么我们可以通过以下代码实现：
+7. RegexValidator ：如果还需要更加复杂的验证，可以通过正则表达式的验证器： RegexValidator 。
+8. 比如现在要验证手机号码是否合格，可以通过以下代码实现：
 
 ```python
 class MyForm(forms.Form):
@@ -3222,20 +3240,24 @@ class MyForm(forms.Form):
 
 
 
-有时候对一个字段验证，不是一个长度，一个正则表达式能够写清楚的，还需要一些其他复杂的逻辑，那么我们可以对某个字段，进行自定义的验证。
+有时候对一个字段验证，不是一个长度，一个正则表达式能够写清楚的，还需要一些其他复杂的逻辑，那么可以对某个字段，进行自定义的验证。
 
-比如在注册的表单验证中，我们想要验证手机号码是否已经被注册过了，那么这时候就需要在数据库中进行判断才知道。
+比如在注册的表单验证中，想要验证手机号码是否已经被注册过了，那么这时候就需要在数据库中进行判断才知道。
 
-对某个字段进行自定义的验证方式是，定义一个方法，这个方法的名字定义规则是： clean_fieldname 。如果验证失败，那么就抛出一个验证错误。
+对某个字段进行自定义的验证方式是，定义一个方法，这个方法的名字定义规则是： clean_fieldname 。
+
+如果验证失败，那么就抛出一个验证错误。
 
 比如要验证用户表中手机号码之前是否在数据库中存在，那么可以通过以下代码实现：
 
 ```python
 class MyForm(forms.Form):
-    telephone = forms.CharField(validators[validators.RegexValidator("1[345678]\d{9}",
-    message='请输入正确格式的手机号码！')])
+    
+    telephone = forms.CharField(validators[validators.RegexValidator("1[345678]\d{9}", message='请输入正确格式的手机号码！')])
     
     def clean_telephone(self):
+        
+        # 获取通过验证后的表单数据
         telephone = self.cleaned_data.get('telephone')
         exists = User.objects.filter(telephone=telephone).exists()
         if exists:
@@ -3245,18 +3267,21 @@ class MyForm(forms.Form):
 
 
 
-以上是对某个字段进行验证，如果验证数据的时候，需要针对多个字段进行验证，那么可以重写 clean 方法。比如要在注册的时候，要判断提交的两个密码是否相等。
+以上是对某个字段进行验证，如果验证数据的时候，**需要针对多个字段进行验证**，那么可以重写 clean 方法。
+
+比如要在注册的时候，要判断提交的两个密码是否相等。
 
 那么可以使用以下代码来完成：
 
 ```python
 class MyForm(forms.Form):
-    telephone = forms.CharField(validators[validators.RegexValidator("1[345678]\d{9}",
-    message='请输入正确格式的手机号码！')])
+    
+    telephone = forms.CharField(validators[validators.RegexValidator("1[345678]\d{9}", message='请输入正确格式的手机号码！')])
     pwd1 = forms.CharField(max_length=12)
     pwd2 = forms.CharField(max_length=12)
     
     def clean(self):
+        
         cleaned_data = super().clean()
         pwd1 = cleaned_data.get('pwd1')
         pwd2 = cleaned_data.get('pwd2')
@@ -3270,19 +3295,25 @@ class MyForm(forms.Form):
 
 
 
-如果验证失败了，那么有一些错误信息是我们需要传给前端的。
+如果验证失败了，那么有一些错误信息是需要传给前端的。
 
-这时候我们可以通过以下属性来获取：
+这时候可以通过以下属性来获取：
 
 1. form.errors ：这个属性获取的错误信息是一个包含了 html 标签的错误信息。
-2. form.errors.get_json_data() ：这个方法获取到的是一个字典类型的错误信息。将某个字段的名字作为 key ，错误信息作为值的一个字典。
+
+2. form.errors.get_json_data() ：这个方法获取到的是一个字典类型的错误信息。将某个**字段的名字作为 key** ，**错误信息作为value**的一个字典。
+
 3. form.as_json() ：这个方法是将 form.get_json_data() 返回的字典 dump 成 json 格式的字符串，方便进行传输。
-4. 上述方法获取的字段的错误值，都是一个比较复杂的数据。比如以下：
+
+4. 上述方法获取的字段的错误值，都是一个比较复杂的数据。
+
+   比如以下：
 
 ```python
-{'username': [
+{
+    'username': [
         {'message': 'Enter a valid URL.', 'code': 'invalid'}, 
-        {'message': 'Ensurethis value has at most 4 characters (it has 22).', 'code': 'max_length'}
+        {'message': 'Ensure this value has at most 4 characters (it has 22).', 'code': 'max_length'}
     ]
 }
 ```
@@ -3301,13 +3332,16 @@ class MyForm(forms.Form):
     username = forms.URLField(max_length=4)
     
     def get_errors(self):
+        
         errors = self.errors.get_json_data()
-         new_errors = {}
+        new_errors = {}
+            
         for key,message_dicts in errors.items():
             messages = []
             for message in message_dicts:
             	messages.append(message['message'])
             new_errors[key] = messages
+            
         return new_errors
 ```
 
@@ -3319,9 +3353,9 @@ class MyForm(forms.Form):
 
 
 
-大家在写表单的时候，会发现表单中的 Field 和模型中的 Field 基本上是一模一样的，而且表单中需要验证的数据，也就是我们模型中需要保存的。
+在写表单的时候，会发现表单中的 Field 和模型中的 Field 基本上是一模一样的，而且表单中需要验证的数据，也就是我们模型中需要保存的。
 
-那么这时候我们就可以将模型中的字段和表单中的字段进行绑定。
+那么这时候就可以将模型中的字段和表单中的字段进行绑定。
 
 比如现在有个 Article 的模型。示例代码如下：
 
@@ -3330,8 +3364,8 @@ from django.db import models
 from django.core import validators
 
 class Article(models.Model):
-    title = models.CharField(max_length=10,validators[validators.MinLengthValidator(li
-    mit_value=3)])
+    
+    title = models.CharField(max_length=10,validators[validators.MinLengthValidator(limit_value=3)])
     content = models.TextField()
     author = models.CharField(max_length=100)
     category = models.CharField(max_length=100)
@@ -3340,14 +3374,16 @@ class Article(models.Model):
 
 
 
-那么在写表单的时候，就不需要把 Article 模型中所有的字段都一个个重复写一遍了。
+那么在写表单的时候，就不需要把 Article 模型中所有的字段都重复写一遍了。
 
 示例代码如下：
 
 ```python
 from django import forms
-    class MyForm(forms.ModelForm):
-        class Meta:
+
+class MyForm(forms.ModelForm):
+    
+    class Meta:
         model = Article
         fields = "__all__"
 ```
@@ -3362,7 +3398,9 @@ MyForm 是继承自 forms.ModelForm ，然后在表单中定义了一个 Meta �
 
 ```python
 from django import forms
+
 class MyForm(forms.ModelForm):
+    
     class Meta:
         model = Article
         fields = ['title','content']
@@ -3370,10 +3408,13 @@ class MyForm(forms.ModelForm):
 
 
 
-如果要验证的字段比较多，只是除了少数几个字段不需要验证，那么可以使用 exclude 来代替 fields 。比如我不想验证 category ，那么示例代码如下：
+如果要验证的字段比较多，只是除了少数几个字段不需要验证，那么可以使用 exclude 来代替 fields 。
+
+比如不想验证 category ，那么示例代码如下：
 
 ```python
 class MyForm(forms.ModelForm):
+
     class Meta:
         model = Article
         exclude = ['category']
@@ -3393,6 +3434,7 @@ class MyForm(forms.ModelForm):
 
 ```python
 class MyForm(forms.ModelForm):
+
     class Meta:
         model = Article
         exclude = ['category']
@@ -3411,7 +3453,7 @@ class MyForm(forms.ModelForm):
 
 
 
-ModelForm 还有 save 方法，可以在验证完成后直接调用 save 方法，就可以将这个数据保存到数据库中了。
+ModelForm 还有 save 方法，可以在验证完成后直接调用 save 方法，就可以将**数据保存到数据库**中了。
 
 示例代码如下：
 
@@ -3427,9 +3469,11 @@ else:
 
 
 
-这个方法必须要在 clean 没有问题后才能使用，如果在 clean 之前使用，会抛出异常。
+这个方法必须要在 clean 没有问题后才能使用，如果**在 clean 之前使用**，会抛出异常。
 
-另外，我们在调用 save 方法的时候，如果传入一个 commit=False ，那么只会生成这个模型的对象，而不会把这个对象真正的插入到数据库中。
+另外，在调用 save 方法的时候，如果传入一个 commit=False ，那么只会生成这个模型的对象，而不会把这个对象真正的插入到数据库中。
+
+
 
 比如表单上验证的字段没有包含模型中所有的字段，这时候就可以先创建对象，再根据填充其他字段，把所有字段的值都补充完成后，再保存到数据库中。
 
