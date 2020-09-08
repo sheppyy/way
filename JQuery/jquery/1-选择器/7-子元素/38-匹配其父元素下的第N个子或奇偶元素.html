@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配其父元素下的第N个子或奇偶元素</title>
+	</head>
+	<body>
+
+		<ul>
+			<li>John</li>
+			<li>Karl</li>
+			<li>Brandon</li>
+		</ul>
+		<ul>
+			<li>Glen</li>
+			<li>Tane</li>
+			<li>Ralph</li>
+		</ul>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 匹配其父元素下的第N个子或奇偶元素
+		 :eq(index) 匹配选择器指定序列的元素，而这个将为每一个父元素匹配子元素。
+		 
+		 :nth-child从1开始的，而:eq()是从0算起的！
+		 
+		 可以使用:<br>nth-child(even)<br>:nth-child(odd)<br>:nth-child(3n)<br>:nth-child(2)<br>:nth-child(3n+1)<br>:nth-child(3n+2)
+		 */
+
+		// 在每个 ul 查找第 2 个li
+		var el = $("ul li:nth-child(2)");
+
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

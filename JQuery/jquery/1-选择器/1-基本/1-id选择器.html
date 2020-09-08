@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>id选择器</title>
+	</head>
+	<body>
+		<div id="div1">
+			<p>id=div1</p>
+		</div>
+		<div id="div2">
+			<p>id=div2</p>
+		</div>
+
+		<span id="foo:bar">1</span>
+		<span id="foo[bar]">2</span>
+		<span id="foo.bar">3</span>
+	</body>
+
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		
+		/**
+		 * ID选择器概述：根据给定的ID匹配一个元素。
+		 *              使用任何的元字符作为名称的文本部分， 它必须被两个反斜杠转义：\\。
+		 * 
+		 * */
+		 
+		// 1. 根据id获取对象
+		var el = $('#div1');
+		console.log(el);
+
+		// 2. 查找含有特殊字符的元素
+		var el = $('#foo\\[bar\\]');
+		console.log(el);
+		console.log(el.text);
+	</script>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>prev & next</title>
+	</head>
+	<body>
+		<form>
+			<label>Name:</label>
+			<input name="name" />
+			<br>
+			<br>
+			<fieldset>
+				<label>Newsletter:</label>
+				<input name="newsletter" />
+			</fieldset>
+			
+		</form>
+		<br>
+		<input name="none" />
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 匹配所有紧接在 prev 元素后的 next 元素
+		 * 
+		 * */
+		// 匹配所有跟在 label 后面的 input 元素 返回两个
+		var el = $("label + input");
+		console.log(el);
+	</script>
+</html>

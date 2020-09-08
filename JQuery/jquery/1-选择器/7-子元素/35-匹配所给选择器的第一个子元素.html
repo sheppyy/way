@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配所给选择器( :之前的选择器)的第一个子元素</title>
+	</head>
+	<body>
+
+		<ul>
+			<li>John</li>
+			<li>Karl</li>
+			<li>Brandon</li>
+		</ul>
+		<ul>
+			<li>Glen</li>
+			<li>Tane</li>
+			<li>Ralph</li>
+		</ul>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 匹配所给选择器( :之前的选择器)的第一个子元素
+		 类似的:first匹配第一个元素，但是:first-child选择器可以匹配多个：即为每个父级元素匹配第一个子元素。这相当于:nth-child(1)
+		 */
+
+		// 在每个 ul 中查找第一个 li
+		var el = $("ul li:first-child");
+
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

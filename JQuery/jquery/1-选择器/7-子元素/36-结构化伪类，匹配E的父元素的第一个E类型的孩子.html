@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>结构化伪类，匹配E的父元素的第一个E类型的孩子</title>
+	</head>
+	<body>
+
+		<div id="n1">
+			<div id="n2" class="abc">
+				<label id="n3">label1</label>
+				<span id="n4">span1</span>
+				<span id="n5" class="abc">span2</span>
+				<span id="n6">span3</span>
+			</div>
+			<div id="n7">
+				<span id="n8" class="abc">span1</span>
+				<span id="n9">span2</span>
+			</div>
+		</div>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 结构化伪类，匹配E的父元素的第一个E类型的孩子。等价于:nth-of-type(1) 选择器。
+		 解释的很模糊，网上搜了很多都是扯淡的解释，作者也只能自己一个个试，试了几十次才弄的稍微有点清楚，如果错了，慢点拍砖，怕怕。直接看示例。
+		 */
+
+		// 查找作为父元素的span类型子元素中的"长子"的span标签
+		var el = $("span:first-of-type");
+
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>元素选择器</title>
+	</head>
+	<body>
+		
+		<div>DIV1</div>
+		<div>DIV2</div>
+		<span>SPAN</span>
+		
+	</body>
+
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		
+		/**
+		 * 元素选择器概述：根据给定的元素标签名匹配所有元素。
+		 * 
+		 * */
+		 
+		var el = $("div");
+		console.log(el);
+		
+		// 输出元素内的内容
+		console.log(el.text());
+		
+		// 输出元素的类型
+		console.log(typeof el);
+	</script>
+</html>

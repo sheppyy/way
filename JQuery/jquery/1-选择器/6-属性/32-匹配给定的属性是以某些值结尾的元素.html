@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配给定的属性是以某些值结尾的元素</title>
+	</head>
+	<body>
+
+		<input name="newsletter" value="newsletter" />
+		<input name="milkman" value="milkman" />
+		<input name="newsboy" value="newsboy" />
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 匹配给定的属性是以某些值结尾的元素
+		 */
+
+		// 查找所有 name 以 'letter' 结尾的 input 元素
+		var el = $("input[name$='letter']");
+
+		console.log(el);
+		console.log(el.val());
+	</script>
+</html>

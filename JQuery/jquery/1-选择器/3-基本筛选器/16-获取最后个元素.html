@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>获取最后个元素</title>
+	</head>
+	<body>
+		<ul>
+		    <li>list item 1</li>
+		    <li>list item 2</li>
+		    <li>list item 3</li>
+		    <li>list item 4</li>
+		    <li>list item 5</li>
+		</ul>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 获取最后个元素
+		 * 
+		 * */
+		
+		// 获取匹配的最后个元素
+		var el = $('li:last');
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

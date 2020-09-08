@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配如 h1, h2, h3之类的标题元素</title>
+	</head>
+	<body>
+		
+		<h1>Header 1</h1>
+		<p>Contents 1</p>
+		<h2>Header 2</h2>
+		<p>Contents 2</p>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 匹配如 h1, h2, h3之类的标题元素
+		 * 
+		 * */
+		
+		// 给页面内所有标题加上背景色
+		var el = $(":header").css("background", "pink");;
+		
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

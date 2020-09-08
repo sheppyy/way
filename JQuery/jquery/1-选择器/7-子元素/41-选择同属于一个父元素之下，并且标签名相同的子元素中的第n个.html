@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>选择同属于一个父元素之下，并且标签名相同的子元素中的第n个。</title>
+	</head>
+	<body>
+
+		<div>
+			<span>John</span>
+			<b>Kim</b>
+			<span>Adam</span>
+			<b>Rafael</b>
+			<span>Oleg</span>
+		</div>
+		<div>
+			<b>Dave</b>
+			<span>Ann</span>
+		</div>
+		<div>
+			<i><span>Maurice</span></i>
+			<span>Richard</span>
+			<span>Ralph</span>
+			<span>Jason</span>
+		</div>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		选择同属于一个父元素之下，并且标签名相同的子元素中的第n个。
+		不常用
+		 */
+
+		// 查找每个span，这个 span 是 其所有兄弟span元素中的第二个元素。  必须为整数，注意从1开始而不是0
+		var el = $("span:nth-of-type(2)");
+
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

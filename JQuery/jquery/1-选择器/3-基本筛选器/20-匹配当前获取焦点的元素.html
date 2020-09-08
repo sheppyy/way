@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配所有正在执行动画效果的元素</title>
+		<style type="text/css">
+			.focused {
+				background: #abcdef;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="content">
+			<input tabIndex="1">
+			<input tabIndex="2">
+			<select tabIndex="3">
+				<option>select menu</option>
+			</select>
+			<div tabIndex="4">
+				a div
+			</div>
+		</div>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 匹配当前获取焦点的元素。
+			如同其他伪类选择器（那些以":"开始），建议:focus前面用标记名称或其他选择;否则，通用选择("*")是不言而喻的。
+			换句话说，$(':focus')等同为$('*:focus')。如果你正在寻找当前的焦点元素，$( document.activeElement )将检索，而不必搜索整个DOM树。
+		 * */
+
+		// 当鼠标点击到元素上时，添加一个"focused"的类名给那些有focus方法的元素
+		$("#content").delegate("*", "focus blur", function(event) {
+			var elem = $(this);
+			setTimeout(function() {
+				elem.toggleClass("focused", elem.is(":focus"));
+			}, 0);
+		});
+		
+	</script>
+</html>

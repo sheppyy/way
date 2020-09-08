@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配 prev 元素之后的所有 siblings 元素</title>
+	</head>
+	<body>
+		<form>
+			<label>Name:</label>
+			<input name="name" />
+			<br>
+			<br>
+			<fieldset>
+				<label>Newsletter:</label>
+				<input name="newsletter" />
+			</fieldset>
+			
+		</form>
+		<br>
+		<input name="none" />
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 匹配 prev 元素之后的所有 siblings 元素
+		 * 
+		 * */
+		// 找到所有与表单同辈的 input 元素 
+		var el = $("form ~ input");
+		console.log(el);
+	</script>
+</html>

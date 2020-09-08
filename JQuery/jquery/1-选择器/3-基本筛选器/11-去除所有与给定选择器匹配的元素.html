@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>去除所有与给定选择器匹配的元素</title>
+	</head>
+	<body>
+		<input type="checkbox" name="apple" value="1" />
+		<input type="checkbox" name="flower" checked="checked" value="2" />
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 去除所有与给定选择器匹配的元素
+		 * 
+		 * */
+		
+		// 查找所有未选中的 input 元素
+		var el = $("input:not(:checked)");
+		console.log(el);
+		
+		// 输出input的值
+		console.log(el.val());
+	</script>
+</html>

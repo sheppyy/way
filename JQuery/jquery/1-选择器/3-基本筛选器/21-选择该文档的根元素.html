@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配所有正在执行动画效果的元素</title>
+		<style type="text/css">
+			.focused {
+				background: #abcdef;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div>hello</div>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 选择该文档的根元素。
+		 在HTML中，文档的根元素，和$(":root")选择的元素一样， 永远是<html>元素。
+		 */
+
+		// 设置<html>背景颜色为黄色
+		$(":root").css("background-color","pink");
+		
+	</script>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配最后一个子元素</title>
+	</head>
+	<body>
+
+		<ul>
+			<li>John</li>
+			<li>Karl</li>
+			<li>Brandon</li>
+		</ul>
+		<ul>
+			<li>Glen</li>
+			<li>Tane</li>
+			<li>Ralph</li>
+		</ul>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 匹配最后一个子元素
+		 :last 只匹配最后一个元素，而此选择符将为每个父元素匹配最后一个子元素
+		 */
+
+		// 在每个 ul 中查找最后一个 li
+		var el = $("ul li:last-child");
+
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

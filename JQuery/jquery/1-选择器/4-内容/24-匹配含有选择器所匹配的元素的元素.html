@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配含有选择器所匹配的元素的元素</title>
+	</head>
+	<body>
+
+		<div><p>Hello</p></div>
+		<div>Hello again!</div>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 匹配含有选择器所匹配的元素的元素
+		 */
+		
+		// 给所有包含 p 元素的 div 元素添加一个 text 类
+		var el = $("div:has(p)").addClass("test");
+
+		console.log(el)
+	</script>
+</html>

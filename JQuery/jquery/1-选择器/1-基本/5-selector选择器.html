@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>selector选择器</title>
+	</head>
+	<body>
+		<div>div</div>
+		<p class="myClass">p class="myClass"</p>
+		<span>span</span>
+		<p class="notMyClass"><p class="notMyClass"</p>
+		
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 将每一个选择器匹配到的元素合并后一起返回。
+		 * 你可以指定任意多个选择器，并将匹配到的元素合并到一个结果内。
+		 * 
+		 * */
+
+		var el = $("div,span,p.myClass");
+		console.log(el);
+
+	</script>
+</html>

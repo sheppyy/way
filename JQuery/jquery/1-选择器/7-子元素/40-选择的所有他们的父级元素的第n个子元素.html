@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>选择的所有他们的父级元素的第n个子元素，计数从最后一个元素到第一个</title>
+	</head>
+	<body>
+
+		<ul>
+			<li>1</li>
+			<li>2</li>
+			<li>3</li>
+			<li>4</li>
+		</ul>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		选择的所有他们的父级元素的第n个子元素，计数从最后一个元素到第一个。
+		不常用
+		 */
+
+		// 在每个匹配的ul中查找倒数第二个li
+		var el = $("ul li:nth-last-of-type(2)");
+
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

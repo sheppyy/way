@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>类选择器</title>
+	</head>
+	<body>
+		<div class="notMe">div class="notMe"</div>
+		<div class="myClass">div class="myClass"</div>
+		<span class="myClass">span class="myClass"</span>
+		
+	</body>
+
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		 * 类选择器概述：根据给定的css类名匹配元素。
+		 * 
+		 * */
+		var el = $(".myClass");
+		console.log(el);
+		
+		// 输出元素内的内容
+		for(i=0; i<el.length; i++){
+			console.log(el[i]);
+		}
+
+	</script>
+</html>
