@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>jQuery([selector,[context]])</title>
+	</head>
+	<body>
+		
+		<div>
+			<form>
+				<input type="text" name="name" id="name" value="first" />
+				<input type="radio" />
+				<input type="button" value="submit" />
+			</form>
+			
+			<p>p1</p>
+			<p>p2</p>
+			<p>p3</p>
+			
+			<form id="form">
+				<div style="display: none;">hide</div>
+				<input type="text" name="name" id="name" value="test" />
+				<input type="button" value="submit" />
+			</form>
+			
+		</div>
+		
+	</body>
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		
+		// 1. 找到所有 p 元素，并且这些元素都必须是 div 元素的子元素。
+		var ps = $("div > p");
+		console.log(ps)
+		for(i=0; i<ps.length; i++)
+			console.log(ps[i].innerHTML);
+		
+		// 2. 设置页面背景色。
+		$(document.body).css( "background", "#aaffff" );
+		
+		// 3. 隐藏一个表单，及其内部的所有元素
+		$('#form').hide()
+		
+		// 4. 在文档的第一个表单中，查找所有的单选按钮(即: type 值为 radio 的 input 元素)。
+		var els = $("input:radio", document.forms[0]);
+		for(i=0; i<els.length; i++)
+			console.log(els[i]);
+		
+	</script>
+</html>

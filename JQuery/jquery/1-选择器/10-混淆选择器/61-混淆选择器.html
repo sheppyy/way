@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>混淆选择器</title>
+	</head>
+	<body>
+
+		<div>
+			<div class="notMe">div class="notMe"</div>
+			<div class=".box myClass">div class=".box myClass"</div>
+			<div class=".box">span class=".box"</div>
+		</div>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		这个方法通常被用在类选择器或者ID选择器中包含一些CSS特殊字符的时候，
+		这个方法基本上与CSS中CSS.escape()方法类似，唯一的区别是jquery中的这个方法支持所有浏览器。
+		 */
+
+		// 选择出类中包含.box的div  这种形式的选择器用得多
+		var el = $("div").find("." + $.escapeSelector(".box"));
+
+		console.log(el);
+		console.log(el.text());
+	</script>
+</html>

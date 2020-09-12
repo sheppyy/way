@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>查找所有重置按钮</title>
+	</head>
+	<body>
+
+		<form>
+			<input type="text" />
+			<input type="checkbox" value="checkbox" />
+			<input type="radio" value="radio" />
+			<input type="image" value="image" />
+			<input type="file" value="file" />
+			<input type="submit" value="submit" />
+			<input type="reset" value="reset" />
+			<input type="password" value="123" />
+			<input type="button" value="button-input" />
+			<select>
+				<option>option</option>
+			</select>
+			<textarea></textarea>
+			<button type="button">button</button>
+		</form>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		查找所有重置按钮
+		 */
+
+		// 查找所有重置按钮
+		var el = $(":reset");
+
+		console.log(el);
+		console.log(el.val());
+	</script>
+</html>

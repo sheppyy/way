@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配给定的属性是以包含某些值的元素</title>
+	</head>
+	<body>
+
+		<input name="man-news" />
+		<input name="milkman" />
+		<input name="letterman2" />
+		<input name="newmilk" />
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		匹配给定的属性是以包含某些值的元素
+		 */
+
+		// 查找所有 name 包含 'man' 的 input 元素
+		var el = $("input[name*='man']");
+
+		console.log(el);
+	</script>
+</html>

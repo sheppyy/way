@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>查找所有密码框</title>
+	</head>
+	<body>
+
+		<form>
+		  <input type="text" />
+		  <input type="checkbox" />
+		  <input type="radio" />
+		  <input type="image" />
+		  <input type="file" />
+		  <input type="submit" />
+		  <input type="reset" />
+		  <input type="password" value="123" />
+		  <input type="button" />
+		  <select><option/></select>
+		  <textarea></textarea>
+		  <button></button>
+		</form>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		查找所有密码框
+		 */
+
+		// 查找所有密码框
+		var el = $(":password");
+
+		console.log(el);
+		console.log(el.val());
+		
+		// 跟什么一个意思
+		console.log($('input:password'));
+		console.log($('input:password').val());
+		
+	</script>
+</html>

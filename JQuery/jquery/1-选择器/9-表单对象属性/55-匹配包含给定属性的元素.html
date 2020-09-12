@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>匹配包含给定属性的元素</title>
+	</head>
+	<body>
+
+		<div>
+			<p>Hello!</p>
+		</div>
+		<div id="test2"></div>
+
+	</body>
+
+	<script src="../../0-jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		/**
+		匹配包含给定属性的元素。注意，在jQuery 1.3中，前导的@符号已经被废除！如果想要兼容最新版本，只需要简单去掉@符号即可。
+		 */
+
+		// 查找所有含有 id 属性的 div 元素
+		var el = $("div[id]");
+
+		console.log(el);
+	</script>
+</html>

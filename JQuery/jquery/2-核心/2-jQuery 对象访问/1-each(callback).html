@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>each(callback)</title>
+	</head>
+	<body>
+		<span>看控制台</span>
+		<hr>
+		<img />
+		<img />
+		<hr>
+
+		<button>Change colors</button><br>
+		<span></span><br>
+		<div></div><br>
+		<div></div><br>
+
+		<div></div><br>
+		<div></div><br>
+		<div id="stop">Stop here</div><br>
+		<div></div><br>
+
+		<div></div><br>
+		<div></div><br>
+		<hr>
+
+	</body>
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		// 1. 迭代两个图像，并设置它们的 src 属性。注意:此处 this 指代的是 DOM 对象而非 jQuery 对象。
+		$("img").each(function(i) {
+			this.src = "test" + i + ".jpg";
+			// this.alt = '图片' + i;
+		});
+
+		// 2. 你可以使用 'return' 来提前跳出 each() 循环。
+		$("button").click(function() {
+			$("div").each(function(index, domEle) {
+				// domEle == this 
+				$(domEle).css({"backgroundColor": "pink", 'height': '20px'});
+				if ($(this).is("#stop")) {
+					$("span").text("Stopped at div index #" + index);
+					return false;
+				}
+			});
+		});
+	</script>
+</html>

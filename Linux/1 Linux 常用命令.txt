@@ -1,0 +1,6 @@
+
+
+ls 命令
+
+	ls -l | grep python
+		以详细信息的方式显示文件名包含python的所有项

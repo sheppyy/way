@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>context</title>
+	</head>
+	<body>
+		
+		<ul></ul>
+		
+	</body>
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		// 检测使用的文档内容
+		$("ul")
+			.append("<li>" + $("ul").context + "</li>")
+			.append("<li>" + $("ul", document.body).context.nodeName + "</li>");
+	</script>
+</html>

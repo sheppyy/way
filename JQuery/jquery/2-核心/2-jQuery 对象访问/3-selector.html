@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>selector</title>
+	</head>
+	<body>
+		<ul></ul>
+	</body>
+	<script src="../../0-jquery/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		// 1. 确定查询的选择器
+		$("ul").append("<li>" + $("ul").selector + "</li>")
+			.append("<li>" + $("ul li").selector + "</li>")
+			.append("<li>" + $("div#foo ul:not([class])").selector + "</li>");
+			
+
+	</script>
+</html>
