@@ -200,6 +200,14 @@ sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
 
 
 
+## 2.4 安装中文输入法
+
+
+
+https://blog.csdn.net/Chamico/article/details/89788324
+
+
+
 
 
 # 3 库&插件安装

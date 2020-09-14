@@ -2,6 +2,8 @@
 
 
 
+
+
 # 1 入门
 
 
@@ -1944,17 +1946,591 @@ def show_reviews(review):
 
 
 
+## 9.1 相关模型对象
+
+
+
+```python
+from django.db import models
+
+class Publisher(models.Model):
+    """出版社"""
+    
+    name = models.CharField(max_length=30)
+    address = models.CharField(max_length=50)
+    city = models.CharField(max_length=60)
+    state_province = models.CharField(max_length=30)
+    country = models.CharField(max_length=50)
+    website = models.URLField()
+    
+    def __str__(self):
+    	return self.name
+    
+class Author(models.Model):
+    """作者"""
+    
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=40)
+    email = models.EmailField()
+    
+    def __str__(self):
+    	return '%s %s' % (self.first_name, self.last_name)
+    
+class Book(models.Model):
+    """图书"""
+    
+    title = models.CharField(max_length=100)
+    # 多对多
+    authors = models.ManyToManyField(Author)
+    # 一对多：一个出版社可以出版多本书
+    publisher = models.ForeignKey(Publisher)
+    publication_date = models.DateField()
+    
+    def __str__(self):
+    	return self.title
+```
+
+
+
+### 9.1.1 查询数据
+
+
+
+以book为例
+
+更多查询详细，:point_right:django2.2中文文档目录 https://docs.djangoproject.com/zh-hans/2.2/
+
+:point_right:(查询接口，什么查询都杵里面)https://docs.djangoproject.com/zh-hans/2.2/ref/models/querysets/#q-objects
+
+```python
+# 1. 获取所有图书
+book_list = Book.objects.all()
+
+# 2. 获取一本图书，如果对应id的书不存在，则报错
+book = Book.objects.get(id=1)
+
+# 3. 获取一本书，返回一个queryset对象，如果没则返回None
+book = Book.objects.filter(id=1).first()
+
+# 4. 获取title包含 py 的所有书籍, 下面两句是等价的，一般都是用第一句的形式
+book = Book.objects.filter(title='python3').all()
+book = Book.objects.filter(title__exact='python3').all()
+
+# 不区分大小写
+book = Book.objects.filter(title__iexact='python3').all()
+
+# 5. 获取title包含 py 的所有书籍
+book = Book.objects.filter(title__contains='py').all()
+
+# 6. 条件表达式，筛选title包含 py 或 以py开头的书
+book_list = Book.objects.filter(Q(title__contains='py') | Q(title__startswith='py'))
+
+...
+```
+
+
+
+### 9.1.2 访问外键值
+
+
+
+首先得知道关联关系。
+
+这里：书是多方，出版社是一方，管理字段在书方建立。
+
+- 正向访问
+
+```python
+# 第一步：获取book对象
+book = Book.objects.filter(id=1).first()
+
+# 第二步：通过book对象访问 出版社对象，及其属性
+publisher = book.publisher
+p_name = book.publisher.name
+```
+
+- 反向访问
+
+```python
+# 第一步：获取publisher对象
+publisher = Publisher.objects.filter(id=1).first()
+
+# 第二步：通过publisher对象，获取所有的图书
+book_list = publisher.book_set.all()
+
+book = Book.objects.filter(id=1).first()
+# 给出版社增加一本书
+publisher.book_set.add(book)
+# 删除一本书
+publisher.book_set.remove(book)
+
+说明：
+	1. 因为模型创建的时候是:
+        publisher = models.ForeignKey(Publisher)
+        
+       即没有指明方向引用的名称，所以f反向访问时就得使用 book_set ：
+    	publisher = Publisher.objects.filter(id=1).first()
+    	book_list = publisher.book_set.all()
+        
+    2. 如果在模型创建的时候，使用related_name='books'指明：
+    	publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE, related_name='books')
+        
+       则反向访问时可以：
+	    publisher = Publisher.objects.filter(id=1).first()
+    	book_list = publisher.books.all()
+```
+
+
+
+**关于：正向访问和反向访问**
+
+- 正向访问：关联字段在模型A，则A模型的对象通过关联对象去访问被关联的对象，就是正向访问。
+- 反向访问：被关联的模型B通过 a_set（内部规则，模型的小写+_set） 或 模型A设置的related_name='related_name'来访问的，就是反向访问
+
+ 
+
+### 9.1.3 多对多相关访问和操作
+
+
+
+多对多的数操作，处理的是 QuerySet 值，而非模型实例。
+
+
+
+```python
+# 获取一本书
+book = Book.objects.filter(id=1).first()
+# 获取这本书的所有作者
+book.authors.all()
+# 过滤数据：获取first_name包含y的作者
+book.authors.filter(first_name__contains='y')
+# 增加一个作者
+author = Author.objects.create(name='mkaer')
+book.authors.add(author)
+
+# 删除一个作者
+book.authors.remove(author)
+```
 
 
 
 
 
+## 9.2 管理器
+
+
+
+管理器可以帮助我们方便的查询数据库。
+
+Book.objects.all()中，属性objects就是一个管理器，all()是它的一个方法。
+
+
+
+### 9.2.1 添加额外的管理器方法
+
+
+
+objects本质上是一个类对象，内部封装了很多操作数据库的方法。
+
+```python
+class BookManager(models.Manager):
+    """
+    自定义图书管理器
+    要继承这个类models.Manager，里面有很多封装好了的方法
+    """
+
+    def title_count(self, keyword):
+        """扩展的方法"""
+        
+        return self.filter(title__icontains=keyword).count()
+
+class Book(models.Model):
+    """图书"""
+
+    title = models.CharField(max_length=100)
+    # 多对多
+    authors = models.ManyToManyField(to='Author', blank=True, null=True)
+    # 一对多：一个出版社可以出版多本书
+    publisher = models.ForeignKey(to='Publisher', on_delete=models.CASCADE, related_name='books', blank=True, null=True)
+    publication_date = models.DateField(auto_now_add=True)
+
+    num_pages = models.IntegerField(blank=True, null=True)
+    # 管理器，这样就多了一个title_count方法
+    objects = BookManager()
+
+    
+# 用的时候就：
+Book.objects.title_count('python')
+```
+
+
+
+### 9.2.2 修改管理器返回的查询集合
+
+
+
+管理器的基本查询集合返回系统中的所有对象。但是可以改变返回集合（挺少这么做的，知道能这么搞就行...）。
+
+
+
+```python
+from django.db import models
+
+# 首先，定义 Manager 子类
+class YangBookManager(models.Manager):
+    def get_queryset(self):
+        # 返回前先过滤一波
+    	return super(YangBookManager, self).get_queryset().filter(author='yang')
+    
+# 然后，放入 Book 模型
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.CharField(max_length=50)
+
+    objects = models.Manager() # 默认的管理器
+    yang_objects = YangBookManager() # 专门查询 yang 的管理器
+```
+
+
+
+## 9.3 模型方法
+
+
+
+模型中自定义的方法为对象添加数据行层的功能。
+
+管理器的作用是执行数据表层的操作，即操作数据库。
+
+模型方法处理的是具体的模型实例，即操作模型对象。
+
+这个挺重要的，其思想就是把业务逻辑代码都放在一个地方，即模型中（公司都这么搞...）。
+
+
+
+```python
+class Author(models.Model):
+    """作者"""
+
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=40)
+    email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return '%s %s' % (self.first_name, self.last_name)
+	
+    # 定义模型方法
+    def _get_full_name(self):
+
+        # 返回一个人的全名
+        return '%s %s' % (self.first_name, self.last_name)
+	# 把一个方法弄成一个属性，使用时直接author.full_name 就可以得到结果了
+    full_name = property(_get_full_name)
+```
+
+
+
+模型里面有很多方法都可以根据自己的业务，重写或者自定义。
+
+
+
+### 9.3.1 覆盖预定义的模型方法
+
+
+
+想模型的增删改查都已经预先定义好了的。
+
+如果要在这些操作前做一写操作，则可以重写这些方法。
+
+```python
+class Author(models.Model):
+    """作者"""
+
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=40)
+    email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return '%s %s' % (self.first_name, self.last_name)
+
+    def save(self, *args, **kwargs):
+
+        if self.first_name == 'ydc':
+            return
+        # 真正执行的地方
+        super().save(*args, **kwargs)
+```
+
+
+
+## 9.4 执行原始 SQL
 
 
 
 
 
+模型的查询 API 不够用时，可以编写原始 SQL。
 
+Django 为执行原始 SQL 查询提供了两种方式：
+
+​	- 使用 Manager.raw() 执行，返回模型实例集合
+
+​	- 完全不用模型层，直接执行自定义的 SQL。
+
+
+
+这方式容易发生 SQL 注入攻击。
+
+
+
+## 9.5 执行原始查询
+
+
+
+管理器的 raw() 方法用于执行原始的 SQL 查询，其返回结果是模型实例集合。
+
+```python
+Manager.raw(raw_query, params=None, translations=None)
+
+# 使用时就这样
+sql = 'SELECT * FROM books_author'
+Book.objects.raw(sql)
+```
+
+
+
+### 9.5.1 模型对应的表名
+
+
+
+如果没定义过模型的表名，底层默认把表名弄成：应用名的小写_模型名的小写，如books_publisher。
+
+也可以自己定义表名，
+
+```python
+class Author(models.Model):
+    """作者"""
+
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=40)
+    email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return '%s %s' % (self.first_name, self.last_name)
+
+	class Meta:
+        db_table = 'author'  # 模型对应在数据库的表名
+```
+
+
+
+### 9.5.2 把查询中的字段映射到模型字段上
+
+
+
+原始sql中查询的字段没有顺序要求。
+
+如果数据库的字段跟模型的字段不一样，可以使用别名矫正。
+
+```python
+Author.objects.raw('''SELECT first AS first_name,
+                        last AS last_name,
+                        bd AS birth_date,
+                        pk AS id,
+                        FROM author''')
+```
+
+
+
+### 9.5.3 索引查找
+
+
+
+因为返回的结果集合是一个序列类型，是可以被索引的。
+
+```python
+Author.objects.raw('SELECT * FROM author LIMIT 1')[0]
+```
+
+
+
+## 9.6 直接执行自定义的 SQL
+
+
+
+如果 Manager.raw() 还不够用，那就直接原生了:strawberry: 。
+
+
+
+```python
+from django.db import connection
+
+def my_custom_sql(self):
+    cursor = connection.cursor()
+    cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [self.baz])
+    cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
+    row = cursor.fetchone()
+    return row
+```
+
+
+
+
+
+# 10 通用视图
+
+
+
+通用视图把视图开发中常用的写法和模式抽象出来，让你编写少量代码就能快速实现常见的数据视图。
+
+显示对象列表就是这样一种任务。
+
+有了通用视图，可以把模型作为额外的参数传给 URL 配置。
+
+
+
+这个挺重要，django的admin模块就是这么整出来的。学好这块，或许就可以重构admin了（毕竟admin这么老的风格...）。
+
+
+
+## 10.1 对象的通用视图
+
+
+
+在视图中呈现数据库里的内容时最能体现 Django 的通用视图是多么强大。
+
+
+
+一个简单例子
+
+- 1 创建模型
+
+```python
+# 模型:models.py
+class Publisher(models.Model):
+    """出版社"""
+
+    name = models.CharField(max_length=30)
+    address = models.CharField(max_length=50, blank=True, null=True)
+    city = models.CharField(max_length=60, blank=True, null=True)
+    state_province = models.CharField(max_length=30, blank=True, null=True)
+    country = models.CharField(max_length=50, blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'publisher'
+        ordering = ["-name"]
+```
+
+- 2 urls.py
+
+```python
+# 项目的urls.py
+from django.contrib import admin
+from django.urls import path, include
+from django.conf.urls import url
+
+urlpatterns = [
+    url('admin/', admin.site.urls),
+    url(r'^publisher/', include(('books.urls', 'books'), namespace='books')),
+]
+
+# books下的urls.py
+from django.conf.urls import url
+from books.views.common_views import PublisherList
+
+urlpatterns = [
+    url(r'^$', PublisherList.as_view())
+]
+
+```
+
+在books下创建一个templates文件夹，再在templates下创建books文件夹，再在books下创建名为publisher_list.html的模板，这些是必须的，不能乱写，不然底层加载不到。
+
+此外， settings的DjangoTemplates 后台的 APP_DIRS 选项设为 True。
+
+
+
+- 3 模板
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h2>Publishers</h2>
+    <ul>
+        {% for publisher in object_list %}
+        <li>{{ publisher.name }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+```
+
+
+
+## 10.2 自定义模板上下文的名称
+
+
+
+上下文是个好东西，放在里面的东西，只要项目在运行，模板都可以拿到里面的内容。
+
+
+
+```python
+# views.py
+from django.views.generic import ListView
+from books.models import Publisher
+	
+class PublisherList(ListView):
+    model = Publisher
+    # 默认数据集合的名称是object_list，可以用这方法修改
+    context_object_name = 'pulisher_list'
+```
+
+
+
+## 10.3 提供额外的上下文变量
+
+
+
+通常，除了通用视图提供的信息之外，还想显示一些额外信息。例如，在各个出版社的详细信息页面显示出版的图书列表。
+
+额外的信息，可以通过扩展 DetailView ，自己实现 get_context_data 方法。默认的实现只为模板提供该显示的对象，不过可
+以覆盖，提供更多信息。
+
+
+
+```python
+from django.views.generic import DetailView
+from books.models import Publisher, Book
+
+class PublisherDetail(DetailView):
+    model = Publisher
+    
+    def get_context_data(self, **kwargs):
+        # 先调用原来的实现，获取上下文
+        context = super(PublisherDetail, self).get_context_data(**kwargs)
+        # 把所有图书构成的查询集合添加到上下文中
+        context['book_list'] = Book.objects.all()
+        return context
+```
+
+
+
+## 10.4 显示对象子集
+
+
+
+
+
+## 10.5 动态过滤
 
 
 
